@@ -1,4 +1,5 @@
-# µSpir Project
+# ULg's Chemical Oceanography Unit
+# Embedded Gaz Analyser
 
 ## Done:
 - Licor 820
