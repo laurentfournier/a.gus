@@ -1,1 +1,1 @@
-# uSpir
+# µSpir Project
