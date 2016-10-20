@@ -1,5 +1,5 @@
 # ULg's Chemical Oceanography Unit
-# Embedded Gaz Analyser
+# Embedded Gaz Analyser \\a.ɡus\\
 
 ## Done:
 - Licor 820
