@@ -3,19 +3,19 @@
 
 
 ## Done:
-- Licor 820 _v0.9_
+- Licor 820 _v1.0_
   - Reading module (**licor_read.py**)
   - Writing module (**licor_write.py**)
   - Functional programming (**Licor R & W**)
+  - Merging licor_read & licor_write (**licor-8xx-6262.py**)
 - Args parser _v1.0_ / Debugging purpose (**All**)
 - First launch script _v1.1_ (**first_launch.py**)
 
 
 ## To-do:
-- Merge licor_read & licor_write (**licor8xx.py**)
 - Licor 840/6262 _v0.3_ 
-  - Data structures (**licor8xx.py**)
-  - Models switching (**licor8xx.py**)
+  - Data structures (**licor-8xx-6262.py**)
+  - Models switching (**licor-8xx-6262.py**)
 - I²C 
   - Communication protocol
   - Sensors data retrieving
@@ -25,4 +25,4 @@
 ## Further in time:
 - Android API
 
-#####  Having trouble with Pages? Feel free to [contact me](mailto://mail@laurent-fournier.be) and i’ll help you sort it out.
+#####  Having questions? Feel free to [contact me](mailto://mail@laurent-fournier.be) and i’ll gladly help you out.
