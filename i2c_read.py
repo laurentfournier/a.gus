@@ -1,9 +1,6 @@
-#!/usr/bin/python
-
 from ABE_ADCPi import ADCPi
 from ABE_helpers import ABEHelpers
-import datetime
-import time
+import datetime, time
 
 """
 ================================================
@@ -32,17 +29,9 @@ def writetofile(texttowrtite):
     f.write(str(datetime.datetime.now()) + " " + texttowrtite)
     f.closed
 
-while (True):
-
-    # read from adc channels and write to the log file
-    writetofile("Channel 1: %02f\n" % adc.read_voltage(1))
-    writetofile("Channel 2: %02f\n" % adc.read_voltage(2))
-    writetofile("Channel 3: %02f\n" % adc.read_voltage(3))
-    writetofile("Channel 4: %02f\n" % adc.read_voltage(4))
-    writetofile("Channel 5: %02f\n" % adc.read_voltage(5))
-    writetofile("Channel 6: %02f\n" % adc.read_voltage(6))
-    writetofile("Channel 7: %02f\n" % adc.read_voltage(7))
-    writetofile("Channel 8: %02f\n" % adc.read_voltage(8))
+while True:
+    # read from 8 adc channels and print it to terminal
+    print("%02f %02f %02f %02f %02f %02f %02f %02f\n" % (adc.read_voltage(1), adc.read_voltage(2), adc.read_voltage(3), adc.read_voltage(4), adc.read_voltage(5), adc.read_voltage(6), adc.read_voltage(7), adc.read_voltage(8)))
 
     # wait 1 second before reading the pins again
     time.sleep(1)
