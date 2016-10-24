@@ -59,6 +59,22 @@ LOG_DIR    = 'logs/'
 #-------------------------------------------------------------
 
   ###################
+  # Writing routine #
+  ###################
+  
+if CONFIG:
+    try:                                                                                # Connect to device
+        licor = Licor(port=PORT, baud=BAUD, timeout=TIMEOUT, debug=DEBUG)
+        licor.connect()
+        #licor.config_R()
+        licor.config_W()
+        
+    except Exception as e:
+        print ("ERROR: {}".format(e))
+                
+        sys.exit("Could not connect to the device")
+
+  ###################
   # Reading routine #
   ###################
   
@@ -108,18 +124,3 @@ else:                                                                           
         if not CONTINUOUS:
             LOOPS -= 1
             
-  ###################
-  # Writing routine #
-  ###################
-  
-if CONFIG:
-    try:                                                                                # Connect to device
-        licor = Licor(port=PORT, baud=BAUD, timeout=TIMEOUT, debug=DEBUG)
-        licor.connect()
-        #licor.config_R()
-        licor.config_W()
-        
-    except Exception as e:
-        print ("ERROR: {}".format(e))
-                
-        sys.exit("Could not connect to the device")
