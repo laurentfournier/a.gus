@@ -1,3 +1,4 @@
+```
 RAW/XML in progress... 1
 <li820><data><celltemp>5.1120729e1</celltemp><cellpres>9.7705745e1</cellpres><co2>7.7817983e2</co2><co2abs>5.0988197e-2</co2abs><ivolt>1.1333007e1</ivolt><raw>2725768,1977365</raw></data></li820>
 
@@ -13,3 +14,4 @@ Traceback (most recent call last):
   File "/usr/lib/python2.7/xml/etree/ElementTree.py", line 1506, in _raiseerror
     raise err
 xml.etree.ElementTree.ParseError: junk after document element: line 2, column 0
+```
