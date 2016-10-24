@@ -3,15 +3,15 @@
 
 
 ## Done:
-- ADCPi Hat v0.1 (**I²C Sensors use purpose**)
+- ADCPi Hat v0.2 (**I²C Sensors use purpose**) [**2016/10/24**]
 - Licor 820 _v1.0_
-  - Reading module (**licor_read.py**)
-  - Writing module (**licor_write.py**)
-  - Functional programming (**Licor R & W**)
-  - Merging licor_read & licor_write (**licor_8xx_6262.py**)
-- Args parser _v1.0_ / Debugging purpose (**All**)
-- First launch script _v1.1_ (**first_launch.py**)
-- **main.py** _v1.1_
+  - ~~Reading module (**licor_read.py**)~~ [**2016/10/20**]
+  - ~~Writing module (**licor_write.py**)~~ [**2016/10/20**]
+  - Functional programming (**Licor R & W**) [**2016/10/21**]
+  - Merging licor_read & licor_write (**licor_8xx_6262.py**) [**2016/10/21**]
+- Args parser _v1.0_ / Debugging purpose (**All**) [**2016/10/15**]
+- First launch script _v1.1_ (**first_launch.py**) [**2016/10/24**]
+- **main.py** _v1.1_ [**2016/10/21**]
 
 
 ## To-do:
