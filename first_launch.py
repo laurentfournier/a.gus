@@ -79,6 +79,9 @@ if os.path.isfile(".cfg") is False:
         if cache['python-crontab'].is_installed is not True:
             setup('python-crontab', 'apt')
             
+        if cache['python-smbus'].is_installed is not True:
+            setup('python-smbus', 'apt')
+        
         if os.path.isdir("logs") is not True :
             setup('logs', 'dir')
             
