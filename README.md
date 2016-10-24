@@ -11,6 +11,7 @@
   - Merging licor_read & licor_write (**licor_8xx_6262.py**)
 - Args parser _v1.0_ / Debugging purpose (**All**)
 - First launch script _v1.1_ (**first_launch.py**)
+- **main.py** _v1.1_
 
 
 ## To-do:
