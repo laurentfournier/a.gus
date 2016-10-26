@@ -1,20 +1,26 @@
 ```
 To-do:
-Main	Multi-threading
+Main	
+ Multi-threading
 
-1st	.
+1st	
+ .
 
-Licor	Headers loader
-	Devices switch
-	780/6262 headers
+Licor	
+ Headers loader
+ Devices switch
+ 780/6262 headers
 
-I²C	Reading routine
+I²C
+ Reading routine
 
-GUI	Terminal
-	Visual
+GUI
+ Terminal
+ Visual
 	
-Backup	Offlline
-	Cloud-based ?
+Backup
+ Offlline
+ Cloud-based ?
 
 Check:
 Serialisation (si possible pas ascii)
