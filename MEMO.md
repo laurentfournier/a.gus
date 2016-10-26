@@ -1,10 +1,20 @@
 ```
-uSpir:
-temperature ~20-50 - failsafe 38
-pH ~7.5-11.5 - failsafe 11
-luminosite
-co2
-conductivite
+To-do:
+Main	Multi-threading
+
+1st	.
+
+Licor	Headers loader
+	Devices switch
+	780/6262 headers
+
+I²C	Reading routine
+
+GUI	Terminal
+	Visual
+	
+Backup	Offlline
+	Cloud-based ?
 
 Check:
 Serialisation (si possible pas ascii)
@@ -12,7 +22,17 @@ Serialisation (si possible pas ascii)
 -----------------------------------------------------------------------------
 -----------------------------------------------------------------------------
 
-				Grammar
+µSpir:
+temperature ~20-50 - failsafe 38
+pH ~7.5-11.5 - failsafe 11
+luminosité
+co2
+conductivité
+
+-----------------------------------------------------------------------------
+-----------------------------------------------------------------------------
+
+				Li820 Grammar
 
 {val | val |...} 	| = or .
 {bool} 			Boolean values
