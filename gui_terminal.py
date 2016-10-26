@@ -11,11 +11,6 @@ import os, sys, subprocess
 import time, datetime
 import serial
 import argparse
-=======
-    screen.clear()              cls
-    screen.addstr("")           add text
-    
-'''
 import curses
 
 screen = curses.initscr()
