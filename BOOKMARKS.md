@@ -22,3 +22,11 @@
 - https://www.linux.com/learn/how-run-your-own-git-server
 - https://about.gitlab.com/
 
+### Curses:
+- http://gnosis.cx/publish/programming/charming_python_6.html
+- https://gist.github.com/myano/1055442
+- https://gist.github.com/anonymous/1885105
+- http://www.roguebasin.com/index.php?title=Python_Curses_Example_of_Dungeon-Building_Algorithm
+- http://stackoverflow.com/questions/14200721/how-to-create-a-menu-and-submenus-in-python-curses
+- http://stackoverflow.com/questions/21172087/i-need-an-example-of-overlapping-curses-windows-using-panels-in-python
+- https://www.ironalbatross.net/wiki/index.php?title=Python_Curses
