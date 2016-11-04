@@ -3,21 +3,22 @@
 
 
 ## Done:
-- ADCPi Hat v0.2 (**I²C Sensors use purpose**) [**2016/10/24**]
-- Licor 820 _v1.0_
+- ADCPi Hat (**I²C Sensors use purpose**) [**2016/10/24**]
+- Licor 820 
   - ~~Reading module (**licor_read.py**)~~ [**2016/10/20**]
   - ~~Writing module (**licor_write.py**)~~ [**2016/10/20**]
   - Functional programming (**Licor R & W**) [**2016/10/21**]
   - Merging licor_read & licor_write (**licor_8xx_6262.py**) [**2016/10/21**]
-- Args parser _v1.0_ / Debugging purpose (**All**) [**2016/10/15**]
-- First launch script _v1.1.2_ (**first_launch.py**) [**2016/10/24**]
-- **main.py** _v1.1_ [**2016/10/21**]
+- Licor 840/6262 
+  - Data structures (**licor_8xx_6262.py**) [**2016/11/04**]
+  - Models switch (**licor_8xx_6262.py**) [**2016/11/04**]
+- Args parser / Debugging purpose (**All**) [**2016/10/15**]
+- First launch script (**first_launch.py**) [**2016/10/24**]
+- Treeing application (**main.py**) [**2016/10/21**]
+- File managing / (**file_manager.py**) [**2016/11/03**]
 
 
 ## To-do:
-- Licor 840/6262 _v0.3_ 
-  - Data structures (**licor_8xx_6262.py**)
-  - Models switch (**licor_8xx_6262.py**)
 - I²C 
   - Communication protocol
   - Sensors data retrieving
