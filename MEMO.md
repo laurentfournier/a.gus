@@ -4,10 +4,9 @@ Main
  Multi-threading
 
 1st	
- .
+ Makefile
 
 Licor	
- Headers loader
  Devices switch
  780/6262 headers
 
@@ -19,11 +18,11 @@ GUI
  Visual
 	
 Backup
- Offlline
+ Offline
  Cloud-based ?
 
 Check:
-Serialisation (si possible pas ascii)
+Serialisation (no ascii..?)
 
 -----------------------------------------------------------------------------
 -----------------------------------------------------------------------------
