@@ -25,44 +25,47 @@ class fManager:
     def cfg_loader(self):
         index    =  0
         subindex = -1
-        j        =  0
         lines    = self.fp.read().split('\n')
             
         for i in lines:
-            print (index, i)
-            
-            if (index == len(lines)-1):
+            if (index is len(lines)-1):
                 break
 
             elif (i[0] is '['):
-                self.pos.append([i[1:-1].lower(), index, -1])
+                self.pos.append([i[1:-1], -1])
                 subindex += 1
                 
             else:
-                self.pos[subindex][2] += 1
+                self.pos[subindex][1] += 1
                 self.pos[subindex].append(i.split('=')[0].lower())
+                
             index += 1                        
-        
-        while (j < len(self.pos[j])):
-            del self.pos[j][self.pos[j][2]+3]
-            j += 1
-                            
-        print (self.pos)
                 
     # Write data to config file
-    def cfg_write(self):
+    def set_cfg(self, mod, opt):
         todo
                 
-    # Determine position in the data loaded
-    def search(self, entry):
-        todo
+    # Determine position and get the data required
+    def get_cfg(self, entry):
+        buff = []
         
-'''
-    Main program
+        for i in range(len(self.pos)):
+            for j in range(len(self.pos[i])):
+                if (self.pos[i][j] == entry):
+                    j += 2
+                    while (j is not len(self.pos[i])):
+                        buff.append(self.pos[i][j])
+                        j += 1
+            
+        return buff
     
 '''
+    Main program
 
-f = fManager('.cfg', 'r')
-f.open()
-f.cfg_loader()
-f.close()
+fp = fManager('.cfg', 'r')
+fp.open()
+fp.cfg_loader()
+print (fp.get_cfg('li820read'))
+fp.close()
+'''
+
