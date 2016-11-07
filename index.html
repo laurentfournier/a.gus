@@ -1,25 +1,44 @@
-<!DOCTYPE html>
-<html lang="en-us">
+<!doctype html>
+<html>
   <head>
-    <meta charset="UTF-8">
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
     <title>Probes Control&amp;Regulation System by OkTekk</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" type="text/css" href="stylesheets/normalize.css" media="screen">
-    <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
-    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
-    <link rel="stylesheet" type="text/css" href="stylesheets/github-light.css" media="screen">
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/github-dark.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+    <script src="javascripts/respond.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <!--[if lt IE 8]>
+    <link rel="stylesheet" href="stylesheets/ie.css">
+    <![endif]-->
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+
   </head>
   <body>
-    <section class="page-header">
-      <h1 class="project-name">Probes Control&amp;Regulation System</h1>
-      <h2 class="project-tagline"></h2>
-      <a href="https://github.com/OkTekk/a.gus" class="btn">View on GitHub</a>
-      <a href="https://github.com/OkTekk/a.gus/zipball/master" class="btn">Download .zip</a>
-      <a href="https://github.com/OkTekk/a.gus/tarball/master" class="btn">Download .tar.gz</a>
-    </section>
+      <div id="header">
+        <nav>
+          <li class="fork"><a href="https://github.com/OkTekk/a.gus">View On GitHub</a></li>
+          <li class="downloads"><a href="https://github.com/OkTekk/a.gus/zipball/master">ZIP</a></li>
+          <li class="downloads"><a href="https://github.com/OkTekk/a.gus/tarball/master">TAR</a></li>
+          <li class="title">DOWNLOADS</li>
+        </nav>
+      </div><!-- end header -->
 
-    <section class="main-content">
-      <h1>
+    <div class="wrapper">
+
+      <section>
+        <div id="title">
+          <h1>Probes Control&amp;Regulation System</h1>
+          <p></p>
+          <hr>
+          <span class="credits left">Project maintained by <a href="https://github.com/OkTekk">OkTekk</a></span>
+          <span class="credits right">Hosted on GitHub Pages &mdash; Theme by <a href="https://twitter.com/michigangraham">mattgraham</a></span>
+        </div>
+
+        <h1>
 <a id="ulgs-chemical-oceanography-unit---embedded-gaz-analyser-aɡus" class="anchor" href="#ulgs-chemical-oceanography-unit---embedded-gaz-analyser-a%C9%A1us" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>ULg's Chemical Oceanography Unit - Embedded Gaz analyser <em>\a.ɡus\</em>
 </h1>
 
@@ -28,38 +47,78 @@
 </blockquote>
 
 <h2>
-<a id="done" class="anchor" href="#done" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Done:</h2>
+<a id="changelog" class="anchor" href="#changelog" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Changelog:</h2>
+
+<p>[<strong>2016/11/07</strong>]</p>
 
 <ul>
-<li>ADCPi Hat (<strong>I²C Sensors use purpose</strong>) [<strong>2016/10/24</strong>]</li>
+<li>Main file updated</li>
+<li>Data processing methods</li>
+<li>Small bugfixes first launch script</li>
+<li>Licor 820/840
+
+<ul>
+<li>Data processing </li>
+<li>Data extraction</li>
+</ul>
+</li>
+</ul>
+
+<p>[<strong>2016/10/24</strong>]</p>
+
+<ul>
+<li>ADCPi Hat (<strong>I²C Sensors's test'</strong>)</li>
+</ul>
+
+<p>[<strong>2016/10/21</strong>]</p>
+
+<ul>
 <li>Licor 820 
 
 <ul>
-<li>
-<del>Reading module (<strong>licor_read.py</strong>)</del> [<strong>2016/10/20</strong>]</li>
-<li>
-<del>Writing module (<strong>licor_write.py</strong>)</del> [<strong>2016/10/20</strong>]</li>
-<li>Functional programming (<strong>Licor R &amp; W</strong>) [<strong>2016/10/21</strong>]</li>
-<li>Merging licor_read &amp; licor_write (<strong>licor_8xx_6262.py</strong>) [<strong>2016/10/21</strong>]</li>
+<li>"Functionalized" the code (<strong>main.py + *.py</strong>)</li>
+<li>Merging licor_read &amp; licor_write (<strong>licor_8xx_6262.py</strong>) </li>
 </ul>
 </li>
-<li>Licor 840/6262 
+</ul>
+
+<p>[<strong>2016/10/20</strong>]</p>
 
 <ul>
-<li>Data structures (<strong>licor_8xx_6262.py</strong>) [<strong>2016/11/04</strong>]</li>
-<li>Models switch (<strong>licor_8xx_6262.py</strong>) [<strong>2016/11/04</strong>]</li>
+<li>Licor 820 
+
+<ul>
+<li>Reading module <del>(<strong>licor_read.py</strong>)</del>
+</li>
+<li>Writing module <del>(<strong>licor_write.py</strong>)</del>
+</li>
 </ul>
 </li>
-<li>Args parser / Debugging purpose (<strong>All</strong>) [<strong>2016/10/15</strong>]</li>
-<li>First launch script (<strong>first_launch.py</strong>) [<strong>2016/10/24</strong>]</li>
-<li>Treeing application (<strong>main.py</strong>) [<strong>2016/10/21</strong>]</li>
-<li>File managing / (<strong>file_manager.py</strong>) [<strong>2016/11/03</strong>]</li>
 </ul>
 
-<h2>
-<a id="to-do" class="anchor" href="#to-do" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>To-do:</h2>
+<p>[<strong>2016/10/15</strong>]</p>
 
 <ul>
+<li>First launch script (<strong>first_launch.py</strong>)</li>
+<li>Args parser (<strong>Debugging purpose</strong>)</li>
+</ul>
+
+<h3>
+<a id="to-do" class="anchor" href="#to-do" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>To-do:</h3>
+
+<ul>
+<li>Licor 840/6262
+
+<ul>
+<li>Data structures (<strong>licor_8xx_6262.py</strong>)</li>
+</ul>
+</li>
+<li>Licor 820/840/6262
+
+<ul>
+<li>Models switch (<strong>licor_8xx_6262.py</strong>)</li>
+</ul>
+</li>
 <li>I²C 
 
 <ul>
@@ -70,8 +129,8 @@
 <li>GUI (<strong>Kivy</strong>)</li>
 </ul>
 
-<h2>
-<a id="further-in-time" class="anchor" href="#further-in-time" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Further in time:</h2>
+<h4>
+<a id="further-in-time" class="anchor" href="#further-in-time" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Further in time:</h4>
 
 <ul>
 <li>Android API</li>
@@ -79,15 +138,10 @@
 
 <h5>
 <a id="having-questions-feel-free-to-contact-me-and-ill-gladly-help-you-out" class="anchor" href="#having-questions-feel-free-to-contact-me-and-ill-gladly-help-you-out" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Having questions? Feel free to <a href="mailto://mail@laurent-fournier.be">contact me</a> and i’ll gladly help you out.</h5>
+      </section>
 
-      <footer class="site-footer">
-        <span class="site-footer-owner"><a href="https://github.com/OkTekk/a.gus">Probes Control&amp;Regulation System</a> is maintained by <a href="https://github.com/OkTekk">OkTekk</a>.</span>
-
-        <span class="site-footer-credits">This page was generated by <a href="https://pages.github.com">GitHub Pages</a> using the <a href="https://github.com/jasonlong/cayman-theme">Cayman theme</a> by <a href="https://twitter.com/jasonlong">Jason Long</a>.</span>
-      </footer>
-
-    </section>
-
-  
+    </div>
+    <!--[if !IE]><script>fixScale(document);</script><![endif]-->
+    
   </body>
 </html>
