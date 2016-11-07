@@ -65,32 +65,30 @@ def setup(name, fType):
 #--------------------------- Execute -------------------------
 #-------------------------------------------------------------
 
-if os.path.isfile(".cfg") is False:
-    os.system('clear')    
-    cache = apt.Cache()
+os.system('clear')    
+cache = apt.Cache()
 
-    try:
-        if cache['python-bs4'].is_installed is not True:
-            setup('python-bs4', 'apt')
+try:
+    if cache['python-bs4'].is_installed is not True:
+        setup('python-bs4', 'apt')
         
-        if cache['python-lxml'].is_installed is not True:
-            setup('python-lxml', 'apt')
+    if cache['python-lxml'].is_installed is not True:
+        setup('python-lxml', 'apt')
             
-        if cache['python-crontab'].is_installed is not True:
-            setup('python-crontab', 'apt')
+    if cache['python-crontab'].is_installed is not True:
+        setup('python-crontab', 'apt')
             
-        if cache['python-smbus'].is_installed is not True:
-            setup('python-smbus', 'apt')
+    if cache['python-smbus'].is_installed is not True:
+        setup('python-smbus', 'apt')
         
-        if os.path.isdir("logs") is not True :
-            setup('logs', 'dir')
+    if os.path.isdir("logs") is not True :
+        setup('logs', 'dir')
             
-        if os.system('pip list | grep Kivy | wc -l') is not 2:
-            setup('Kivy', 'pip')
-            setup('Kivy-Garden', 'pip')
-            setup('graph', 'gar')
+    if os.system('pip list | grep Kivy | wc -l') is not 2:
+        setup('Kivy', 'pip')
+        setup('Kivy-Garden', 'pip')
+        setup('graph', 'gar')
 
-    except Exception as e:
-        print ("ERROR: {}".format(e))
+except Exception as e:
+    print ("ERROR: {}".format(e))
 
-    os.mknod(".cfg")
