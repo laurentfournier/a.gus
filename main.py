@@ -12,7 +12,8 @@ import argparse
 from bs4  import BeautifulSoup as bs
 from lxml import etree
 
-import first_launch   as fl
+#import first_launch   as fl
+import file_manager   as fm
 import licor_8xx_6262 as li
 
 #-------------------------------------------------------------
@@ -42,9 +43,8 @@ DEBUG      = args.debug
 DEVICE     = args.model
 LOG        = args.logging
 LOOPS      = args.loops                                                                 # Nr of data extractions
-DEVICE     = args.model                                                                 # List of devices's models
 
-FREQ       = 60
+FREQ       = 5
 PORT       = '/dev/ttyUSB0'
 BAUD       = 9600
 PARITY     = 'N'
@@ -64,10 +64,19 @@ LOG_DIR    = 'logs/'
   
 if CONFIG:
     try:                                                                                # Connect to device
-        licor = Licor(port=PORT, baud=BAUD, timeout=TIMEOUT, debug=DEBUG)
+        licor = li.Licor(port=PORT,
+                         baud=BAUD,
+                         timeout=TIMEOUT,
+                         config=CONFIG,
+                         continuous=CONTINUOUS,
+                         debug=DEBUG,
+                         device=DEVICE,
+                         log=LOG,
+                         loops=LOOPS)
         licor.connect()
-        #licor.config_R()
-        licor.config_W()
+        licor.config_R()
+        #licor.config_W()
+        sys.exit("Configuration finished")
         
     except Exception as e:
         print ("ERROR: {}".format(e))
@@ -84,8 +93,16 @@ if LOG_DIR:                                                                     
     filename = os.path.join(LOG_DIR, filename)
 
 try:                                                                                    # Connect to device
-    licor = li.Licor(port=PORT, baud=BAUD, timeout=TIMEOUT, debug=DEBUG)
-    licor.k()
+    licor = li.Licor(port=PORT,
+                     baud=BAUD,
+                     timeout=TIMEOUT,
+                     config=CONFIG,
+                     continuous=CONTINUOUS,
+                     debug=DEBUG,
+                     device=DEVICE,
+                     log=LOG,
+                     loops=LOOPS)
+    licor.connect()
     
 except Exception as e:
     if DEBUG:
