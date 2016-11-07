@@ -8,7 +8,6 @@ import os, sys
 import datetime, time
 import apt, pip
 
-
 #-------------------------------------------------------------
 #------------------ Create an object 'C-like' ----------------
 #---------- Because there are no switch in Python ------------
