@@ -67,7 +67,7 @@ class Licor:
         self.device     = kwargs.pop('device',  DEVICE)
         self._header    = kwargs.pop('header',  HEADER)
 
-        fp = fm.fManager('.cfg', 'r')
+        fp = fm.fManager('config/.cfg', 'r')
         fp.open()
         fp.cfg_loader()
 
