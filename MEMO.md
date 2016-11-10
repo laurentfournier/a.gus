@@ -5,6 +5,13 @@ Main
 
 1st	
  Makefile
+ -+ config.txt
+ - sonic-pi
+ - wolfram
+ + deps
+ + rpi-upgrade
+ + log dir
+ + cfg dir
 
 Licor	
  Devices switch
@@ -23,6 +30,15 @@ Backup
 
 Check:
 Serialisation (no ascii..?)
+
+Priorité:
+ température
+ pH
+ turbidité
+ Makefile
+ gui
+ lan
+ smartphone
 
 -----------------------------------------------------------------------------
 -----------------------------------------------------------------------------
