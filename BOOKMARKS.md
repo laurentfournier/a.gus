@@ -31,3 +31,4 @@
 - http://stackoverflow.com/questions/21172087/i-need-an-example-of-overlapping-curses-windows-using-panels-in-python
 - https://www.ironalbatross.net/wiki/index.php?title=Python_Curses
 - https://docs.python.org/dev/howto/curses.html
+- http://npyscreen.readthedocs.io/
