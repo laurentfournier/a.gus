@@ -30,3 +30,4 @@
 - http://stackoverflow.com/questions/14200721/how-to-create-a-menu-and-submenus-in-python-curses
 - http://stackoverflow.com/questions/21172087/i-need-an-example-of-overlapping-curses-windows-using-panels-in-python
 - https://www.ironalbatross.net/wiki/index.php?title=Python_Curses
+- https://docs.python.org/dev/howto/curses.html
