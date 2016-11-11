@@ -3,6 +3,11 @@
 
 
 ## Changelog:
+[**2016/11/10**]
+- Moved concerned files to **/config/** and **/libs/** instead of project's root 
+- Minor adds to Makefile 
+- I²C reading tests
+  
 [**2016/11/07**]
 - Main file updated
 - Data processing methods (**file_manager.py**)
@@ -29,18 +34,20 @@
 - Args parser (**Debugging purpose**)
 
 
-### To-do:
-- Licor 840/6262
+## To-do:
+- Licor 840/6262/7000
   - Data structures
-- Licor 820/840/6262
+- Licor 820/840/6262/7000
   - Models switch
 - I²C 
   - Communication protocol
   - Sensors data retrieving
-- GUI (**Kivy**)
+- X GUI (**Kivy**)
+- Term GUI (**Curves**)
 
 
-#### Further in time:
+## Further in time:
+- Cloud backup
 - Android API
 
 #####  Having questions? Feel free to [contact me](mailto://mail@laurent-fournier.be) and i’ll gladly help you out.
