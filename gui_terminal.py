@@ -13,6 +13,9 @@ import serial
 import argparse
 import curses
 
+    # screen.clear()              cls
+    # screen.addstr("")           add text
+    
 screen = curses.initscr()
 
 curses.noecho() 
@@ -50,3 +53,4 @@ while True:
         screen.addstr("No help yet *_*") 
         
 curses.endwin()
+
