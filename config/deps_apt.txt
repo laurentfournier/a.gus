@@ -2,3 +2,4 @@ python-bs4
 python-lxml
 python-crontab
 python-smbus
+cython
