@@ -5,19 +5,19 @@
 ## Changelog:
 [**2016/11/07**]
 - Main file updated
-- Data processing methods
-- Small bugfixes first launch script
+- Data processing methods (**file_manager.py**)
+- Small bugfixes (**~~first_launch.py~~ -> Makefile**)
 - Licor 820/840
   - Data processing 
   - Data extraction
   
 [**2016/10/24**]
-- ADCPi Hat (**I²C Sensors's test'**)
+- ADCPi Hat (**i2c_read.py**)
 
 [**2016/10/21**]
 - Licor 820 
   - "Functionalized" the code (**main.py + *.py**)
-  - Merging licor_read & licor_write (**licor_8xx_6262.py**) 
+  - Merging licor_read & licor_write (**~~licor_*.py~~ -> licor_8xx_6262.py**) 
 
 [**2016/10/20**]
 - Licor 820 
@@ -25,15 +25,15 @@
   - Writing module ~~(**licor_write.py**)~~
 
 [**2016/10/15**]
-- First launch script (**first_launch.py**)
+- First launch script (**~~first_launch.py~~**)
 - Args parser (**Debugging purpose**)
 
 
 ### To-do:
 - Licor 840/6262
-  - Data structures (**licor_8xx_6262.py**)
+  - Data structures
 - Licor 820/840/6262
-  - Models switch (**licor_8xx_6262.py**)
+  - Models switch
 - I²C 
   - Communication protocol
   - Sensors data retrieving
