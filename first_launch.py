@@ -84,6 +84,7 @@ try:
         setup('logs', 'dir')
             
     if os.system('pip list | grep Kivy | wc -l') is not 2:
+        setup('cython', 'apt')
         setup('Kivy', 'pip')
         setup('Kivy-Garden', 'pip')
         setup('graph', 'gar')
