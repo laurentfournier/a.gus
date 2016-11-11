@@ -56,4 +56,4 @@
 - Android API
 
 
-#####  Having questions? Feel free to [contact me](mailto://mail@laurent-fournier.be) and i’ll gladly help you out.
+#####  Having questions? Feel free to [contact me](mailto:mail@laurent-fournier.be) and i’ll gladly help you out.
