@@ -3,11 +3,6 @@
     
     Written by David H. Hagan, May 2016
     Modifications by Laurent Fournier, October 2016
-
-    To-do :
-    - !!! Devices switch (local vars issue ?)
-    - For 840:  celltemp, cellpres, co2, h2o, h2odewpoint
-    - For 6262: celltemp, cellpres, co2, h2o, h2odewpoint
 '''
 
 import os, sys, subprocess
@@ -71,12 +66,18 @@ class Licor:
         fp.open()
         fp.cfg_loader()
 
-        if self.config:                                                                  # Write to the device
-            self._header = [ line.strip() for line in fp.get_cfg('li820write') ]
+        if self.config:                                                                 # Write to the device
+            if   self.device == 820:  self._header = [ line.strip() for line in fp.get_cfg('li820write') ]
+            elif self.device == 840:  self._header = [ line.strip() for line in fp.get_cfg('li840write') ]
+            elif self.device == 6262: self._header = [ line.strip() for line in fp.get_cfg('li6262write') ]
+            elif self.device == 7000: self._header = [ line.strip() for line in fp.get_cfg('li7000write') ]
             
-        else:                                                                       # Read from the device
-            self._header = [ line.strip() for line in fp.get_cfg('li820read') ]
-            
+        else:                                                                           # Read from the device
+            if   self.device == 820:  self._header = [ line.strip() for line in fp.get_cfg('li820read') ]
+            elif self.device == 840:  self._header = [ line.strip() for line in fp.get_cfg('li840read') ]
+            elif self.device == 6262: self._header = [ line.strip() for line in fp.get_cfg('li6262read') ]
+            elif self.device == 7000: self._header = [ line.strip() for line in fp.get_cfg('li7000read') ]
+
         fp.close()
 
     def connect(self):
@@ -94,11 +95,15 @@ class Licor:
     def read(self):
         raw = bs(self.con.readline(), 'lxml')                                           # Read a complete row input stream
 
-        raw = raw.li820.data                                                        # Define data structure
-        res = [ datetime.datetime.now().isoformat(';'),                             # where will be stored data from the device
-                raw.celltemp.string,
-                raw.cellpres.string,
-                raw.co2.string, ]
+        if self.device == 820:                                                          # Define data structure
+            raw = raw.li820.data
+            res = [ datetime.datetime.now().isoformat(';'), raw.celltemp.string,
+                    raw.cellpres.string, raw.co2.string, ]
+
+        elif self.device == 840:
+            raw = raw.li840.data
+            res = [ datetime.datetime.now().isoformat(';'), raw.celltemp.string, raw.cellpres.string,
+                    raw.co2.string, raw.h2o.string, raw.h2odewpoint, ]
 
         print ("\nNew Data Point")
         for each in zip(self._header, res):
@@ -107,26 +112,27 @@ class Licor:
         return res
 
     def config_W(self):                                                                 # Write a complete instruction row
-        conf = etree.Element(self._header[0])                                       # <li820>
-        cfgs = etree.SubElement(conf, self._header[9])                              #   <cfg>
-        outr = etree.SubElement(cfgs, self._header[11])                             #       <outrate>  --> 1
-        outr.text = "1"
-        conn = etree.SubElement(conf, self._header[1])                              #   <rs232>
-        co2a = etree.SubElement(conn, self._header[5])                              #       <co2abs>   --> False
-        co2a.text = "false"
-        ivol = etree.SubElement(conn, self._header[6])                              #       <ivolt>    --> False
-        ivol.text = "false"
-        raws = etree.SubElement(conn, self._header[7])                              #       <raw>      --> False
-        raws.text = "false"
+        if self.device == 820:
+            conf = etree.Element(self._header[0])                                       # <li820>
+            cfgs = etree.SubElement(conf, self._header[9])                              #   <cfg>
+            outr = etree.SubElement(cfgs, self._header[11])                             #       <outrate>  --> 1
+            outr.text = "1"
+            conn = etree.SubElement(conf, self._header[1])                              #   <rs232>
+            co2a = etree.SubElement(conn, self._header[5])                              #       <co2abs>   --> False
+            co2a.text = "false"
+            ivol = etree.SubElement(conn, self._header[6])                              #       <ivolt>    --> False
+            ivol.text = "false"
+            raws = etree.SubElement(conn, self._header[7])                              #       <raw>      --> False
+            raws.text = "false"
 
         self.con.write(etree.tostring(conf, pretty_print = False))                      # Send command
         print ("Input: " + etree.tostring(conf, pretty_print = False))                  # Licor answer (ACK true or false)
         data_response = self.con.readline()
         print ("Output: " + data_response)
     
-    def config_R(self):                                                                 # Write a config request
-        info = etree.Element(self._header[0])                                           # Write the actual configuration
-        info.text = "?"                                                                 # <li820>?</li820>
+    def config_R(self):                                                                 # Ask actual config
+        info = etree.Element(self._header[0])                                           # 
+        info.text = "?"                                                                 # <liXXX>?</liXXX>
         
         self.con.write(etree.tostring(info, pretty_print = False))
         print ("Input: " + etree.tostring(info, pretty_print = False))
