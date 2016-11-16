@@ -63,22 +63,19 @@ LOG_DIR    = 'logs/'
 #-------------------------------------------------------------
 #----- Better know what you are doing from this point --------
 #-------------------------------------------------------------    
-try:                                                                                    # Connect to device
-    if DEVICE == 820 or DEVICE == 840:
-        probe = Licor8xx(port=PORT, baud=BAUD, timeout=TIMEOUT, config=CONFIG, continuous=CONTINUOUS, debug=DEBUG, device=DEVICE, log=LOG, loops=LOOPS)
-        
-    elif DEVICE == 6262:
-        probe = Licor6xx(port=PORT, baud=BAUD, timeout=TIMEOUT, config=CONFIG, continuous=CONTINUOUS, debug=DEBUG, device=DEVICE, log=LOG, loops=LOOPS)
+args_list = { 'port' : PORT,    'baud': BAUD,             'timeout': TIMEOUT,
+              'config': CONFIG, 'continuous': CONTINUOUS, 'debug': DEBUG,
+              'device': DEVICE, 'log': LOG,               'loops': LOOPS }
 
-    elif DEVICE == 7000:
-        probe = Licor7xx(port=PORT, baud=BAUD, timeout=TIMEOUT, config=CONFIG, continuous=CONTINUOUS, debug=DEBUG, device=DEVICE, log=LOG, loops=LOOPS)
+try:                                                                                    # Connect to device
+    if   DEVICE == 820 or DEVICE == 840: probe = Licor8xx(**args_list)        
+    elif DEVICE == 6262:                 probe = Licor6xx(**args_list)
+    elif DEVICE == 7000:                 probe = Licor7xx(**args_list)
 
     probe.connect()
     
 except Exception as e:
-    if DEBUG:
-        print ("ERROR: {}".format(e))
-    
+    if DEBUG: print ("ERROR: {}".format(e))    
     sys.exit("Could not connect to the device")
 
   ###################
@@ -91,21 +88,26 @@ if CONFIG:                                                                      
         probe.config_W()
         
     except Exception as e:
-        if DEBUG:
-            print ("ERROR: {}".format(e))
-        
+        if DEBUG: print ("ERROR: {}".format(e))        
         sys.exit("Could not connect to the device")
 
   ###################
   # Reading routine #
   ###################
   
-filename = 'licor{}-data-{}.csv'.format(DEVICE, datetime.datetime.now())
+filename = 'licor{0}/licor{0}-data-{1}.csv'.format(DEVICE, datetime.datetime.now())
 
 if LOG_DIR:                                                                             # If LOG_DIR is set, add it to filename
     filename = os.path.join(LOG_DIR, filename)
 
 if LOG:                                                                                 # If logging is enabled
+    try:                                                                                # Verify if directory already exists
+        with open(filename, 'r'): pass
+    
+    except Exception:                                                                   # If not, create them
+        os.system('mkdir {}/licor{}/'.format(LOG_DIR, DEVICE))
+        pass
+        
     with open(filename, 'w') as fp:
         fp.write(';'.join(probe._header))                                               # Write headers
         fp.write('\n')
@@ -119,16 +121,14 @@ if LOG:                                                                         
             except Exception as e:
                 if DEBUG: print ("ERROR: {}".format(e))
                     
-            time.sleep(FREQ)                                                            # Sleep for FREQ seconds
-            
+            time.sleep(FREQ)                                                            # Sleep for FREQ seconds            
             if not CONTINUOUS: LOOPS -= 1
                 
         fp.close()
-        
+            
 else:                                                                                   # If logging is Disabled
     while LOOPS:
         data = probe.read()
-        time.sleep(FREQ)
-        
+        time.sleep(FREQ)        
         if not CONTINUOUS: LOOPS -= 1
             
