@@ -53,3 +53,4 @@ while True:
         screen.addstr("No help yet *_*") 
         
 curses.endwin()
+
