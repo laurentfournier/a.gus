@@ -1,7 +1,7 @@
 '''
     Files IO managing and processing
     
-    Written by Laurent Fournier, Novembre 2016
+    Written by Laurent Fournier, November 2016
 '''
 
 import os, sys, subprocess
@@ -62,10 +62,10 @@ class fManager:
 '''
     Main program
 
-fp = fManager('.cfg', 'r')
+fp = fManager('config/.cfg', 'r')
 fp.open()
 fp.cfg_loader()
-print (fp.get_cfg('li820read'))
+print fp.get_cfg('li820read')
 fp.close()
 '''
 

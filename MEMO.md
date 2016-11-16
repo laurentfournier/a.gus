@@ -13,10 +13,6 @@ Main
  + log dir
  + cfg dir
 
-Licor	
- Devices switch
- 780/6262 headers
-
 I²C
  Reading routine
 
