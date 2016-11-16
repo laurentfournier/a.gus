@@ -60,14 +60,3 @@ class fManager:
                         j += 1
             
         return buff
-    
-'''
-    Main program
-
-fp = fManager('config/.cfg', 'r')
-fp.open()
-fp.cfg_loader()
-print fp.get_cfg('li820read')
-fp.close()
-'''
-
