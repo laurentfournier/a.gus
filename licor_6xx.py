@@ -92,8 +92,8 @@ class Licor6xx:
 
     def read(self):
         raw = self.con.readline()
-        res = [ datetime.datetime.now().isoformat(';'), raw.split()[0], raw.split()[1],
-                raw.split()[2], raw.split()[3], raw.split()[4] ]
+        res = [ datetime.datetime.now().strftime('%Y-%m-%d'), datetime.datetime.now().strftime('%H:%M:%S'),
+                raw.split()[0], raw.split()[1], raw.split()[2], raw.split()[3], raw.split()[4] ]
 
         if self.debug:
             print ("\nNew Data Point")

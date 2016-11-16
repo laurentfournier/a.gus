@@ -93,8 +93,8 @@ class Licor7xx:
     def read(self):
         raw = bs(self.con.readline())
         raw = raw.li7000
-        res = [ datetime.datetime.now().isoformat(';'), raw.celltemp.string, raw.cellpres.string,
-                    raw.co2.string, raw.h2o.string, raw.h2odewpoint, ]
+        res = [ datetime.datetime.now().strftime('%Y-%m-%d'), datetime.datetime.now().strftime('%H:%M:%S'),
+                raw.celltemp.string, raw.cellpres.string, raw.co2.string, raw.h2o.string, raw.h2odewpoint, ]
 
         print ("\nNew Data Point")
         for each in zip(self._header, res):
