@@ -99,14 +99,14 @@ class Licor8xx:
         if self.device == 820:                                                          # Define data structure
             raw = bs(self.con.readline(), 'lxml')
             raw = raw.li820.data
-            res = [ datetime.datetime.now().isoformat(';'), raw.celltemp.string,
-                    raw.cellpres.string, raw.co2.string, ]
+            res = [ datetime.datetime.now().strftime('%Y-%m-%d'), datetime.datetime.now().strftime('%H:%M:%S'),
+                    raw.celltemp.string, raw.cellpres.string, raw.co2.string, ]
 
         elif self.device == 840:
             raw = bs(self.con.readline(), 'lxml')
             raw = raw.li840.data
-            res = [ datetime.datetime.now().isoformat(';'), raw.celltemp.string, raw.cellpres.string,
-                    raw.co2.string, raw.h2o.string, raw.h2odewpoint, ]
+            res = [ datetime.datetime.now().strftime('%Y-%m-%d'), datetime.datetime.now().strftime('%H:%M:%S'),
+                    raw.celltemp.string, raw.cellpres.string, raw.co2.string, raw.h2o.string, raw.h2odewpoint, ]
 
         if self.debug:
             print ("\nNew Data Point")
