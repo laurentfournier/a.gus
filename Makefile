@@ -9,11 +9,6 @@ clean:
 	find . -name '*.pyo' -exec rm --force {} +
 	find . -name '*~' -exec rm --force  {} +
 
-clean-build:
-	rm --force --recursive build/
-	rm --force --recursive dist/
-	rm --force --recursive *.egg-info
-
 init:
 	wget http://www.laurent-fournier.be/rpi/.bashrc
 	mv .bashrc ~/
@@ -31,21 +26,13 @@ init:
 	garden install graph
 	sudo reboot
 	
-test:
-	clean-pyc
-	py.test --verbose --color=yes $(TEST_PATH)
-
 run:
 	python main.py runserver
     
 help:
 	@echo "    clean"
 	@echo "        Remove python artifacts."
-	@echo "    clean-build"
-	@echo "        Remove build artifacts."
 	@echo "    init"
 	@echo "        Install dependencies and create required directories."
-	@echo "    test"
-	@echo "        Run py.test"
 	@echo '    run'
 	@echo '        Run the `my_project` service on your local machine.'
