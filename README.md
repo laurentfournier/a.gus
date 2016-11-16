@@ -3,6 +3,12 @@
 
 
 ## Changelog:
+[**2016/11/15**]
+- Added **tools.py** to store some raw functions (eq. a switch 'C-like') 
+- Added Licors switch
+- Separated ~~**licor_8xx_6262.py**~~ by families (**licor_8xx.py**, **licor_6xx.py** and **licor_7xx.py**)
+- More GUI Terminal tests (Curses and NPyScreen)
+
 [**2016/11/10**]
 - Moved concerned files to **/config/** and **/libs/** instead of project's root 
 - Minor adds to Makefile 
