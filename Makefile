@@ -12,19 +12,20 @@ clean:
 init:
 	wget http://www.laurent-fournier.be/rpi/.bashrc
 	mv .bashrc ~/
+	sudo su -
 	wget http://www.laurent-fournier.be/rpi/config.txt
-	sudo mv .bashrc /boot/
+	mv .bashrc /boot/
 	wget http://www.laurent-fournier.be/rpi/wpa_supplicant.conf
-	sudo mv wpa_supplicant.conf /etc/wpa_supplicant/
-	source ~/.bashrc
-	mkdir logs
-	sudo apt-get update
-	sudo apt-get autoremove -y $(CFG_PATH)/rm_apt.txt
-	sudo apt-get install -y $(CFG_PATH)/deps_apt.txt
-	sudo apt-get upgrade
+	mv wpa_supplicant.conf /etc/wpa_supplicant/
+	apt-get update
+	apt-get autoremove -y $(CFG_PATH)/rm_apt.txt
+	apt-get install -y $(CFG_PATH)/deps_apt.txt
+	apt-get upgrade
 	pip install -r $(CFG_PATH)/deps_pip.txt
 	garden install graph
-	sudo reboot
+	source ~/.bashrc
+	mkdir logs
+	reboot
 	
 run:
 	python main.py runserver
