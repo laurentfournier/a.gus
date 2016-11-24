@@ -50,7 +50,7 @@ CONTINUOUS = args.continuous
 DEBUG      = args.debug
 DEVICE     = args.model
 LOG        = args.logging
-LOOPS      = args.loops                                                                 # Nr of data extractions
+LOOPS      = args.loops                                                                     # Nr of data extractions
 
 FREQ       = 5
 PORT       = '/dev/ttyUSB0'
@@ -61,41 +61,51 @@ BYTE_SZ    = 8
 TIMEOUT    = 5.0
 LOG_DIR    = 'logs/'
 
+args_list  = { 'port' : PORT,    'baud': BAUD,             'timeout': TIMEOUT,
+               'config': CONFIG, 'continuous': CONTINUOUS, 'debug': DEBUG,
+               'device': DEVICE, 'log': LOG,               'loops': LOOPS }
+
 exitFlag   = 0
-threadList = ["Thread-1", "Thread-2", "Thread-3"]
+threadList = [ "Thread-1", "Thread-2" ]
 nameList   = ["One", "Two", "Three", "Four", "Five"]
 queueLock  = threading.Lock()
 workQueue  = Queue.Queue(10)
 threads    = []
 threadID   = 1
-args_list  = { 'port' : PORT,    'baud': BAUD,             'timeout': TIMEOUT,
-               'config': CONFIG, 'continuous': CONTINUOUS, 'debug': DEBUG,
-               'device': DEVICE, 'log': LOG,               'loops': LOOPS }
-
 #-------------------------------------------------------------
 #------------------ Create 'thread' object -------------------
 #-------------------------------------------------------------
 class myThread(threading.Thread):
-    def __init__(self, threadID, name, counter, **kwargs):
+    def __init__(self, threadID, name, counter, kwargs):
         threading.Thread.__init__(self)
         self.threadID = threadID
         self.name = name
         self.counter = counter
         self.kwargs = kwargs
-
+        
     def run(self):
         print "Starting " + self.name
-        Licor(**kwargs)
+        Licor(**self.kwargs)
         print "Finishing " + self.name
 
 #-------------------------------------------------------------
 #----------------- Tests for Licor sensors -------------------
 #-------------------------------------------------------------
 def Licor(**kwargs):
+    PORT       = kwargs.pop('port',    PORT)
+    BAUD       = kwargs.pop('baud',    BAUD)
+    TIMEOUT    = kwargs.pop('timeout', TIMEOUT)
+    CONFIG     = kwargs.pop('config',  CONFIG)
+    CONTINUOUS = kwargs.pop('continuous', CONTINUOUS)
+    DEBUG      = kwargs.pop('debug',   DEBUG)
+    LOG        = kwargs.pop('log',     LOG)
+    LOOPS      = kwargs.pop('loops',   LOOPS)
+    DEVICE     = kwargs.pop('device',  DEVICE)
+    
     try:                                                                                    # Connect to device
-        if   DEVICE == 820 or DEVICE == 840: probe = Licor8xx(**kwargs)
-        elif DEVICE == 6262:                 probe = Licor6xx(**kwargs)
-        elif DEVICE == 7000:                 probe = Licor7xx(**kwargs)
+        if   DEVICE == 820 or DEVICE == 840: probe = Licor8xx(**args_list)
+        elif DEVICE == 6262:                 probe = Licor6xx(**args_list)
+        elif DEVICE == 7000:                 probe = Licor7xx(**args_list)
 
         probe.connect()
 
@@ -136,19 +146,14 @@ def Licor(**kwargs):
             fp.write('\n')
 
             while LOOPS:
-                if (datetime.datetime.now().strftime("%S") == "00" and isDone == 0):
-                    isDone = 1
+                if (datetime.datetime.now().strftime("%S") == "00"):
                     try:
-                        data = probe.read()                                                     # Read from device
-                        fp.write(';'.join(data))                                                # Write data
+                        data = probe.read()                                                 # Read from device
+                        fp.write(';'.join(data))                                            # Write data
                         fp.write('\n')
 
                     except Exception as e:
                         if DEBUG: print ("ERROR: {}".format(e))
-
-                else:
-                    isDone = 0
-                    if not CONTINUOUS: LOOPS += 1
 
                 if not CONTINUOUS: LOOPS -= 1
 
@@ -156,43 +161,39 @@ def Licor(**kwargs):
 
     else:                                                                                   # If logging is Disabled
         while LOOPS:
-            if (datetime.datetime.now().strftime("%S") == "00" and isDone == 0):
-                isDone = 1
+            if (datetime.datetime.now().strftime("%S") == "00"):
                 data = probe.read()
-
-            else:
-                isDone = 0
-                if not CONTINUOUS: LOOPS += 1
 
             if not CONTINUOUS: LOOPS -= 1
 
 #-------------------------------------------------------------
 #----------------------- Main program ------------------------
 #-------------------------------------------------------------
-# Create new threads
-for tName in threadList:
-    thread = myThread(threadID, tName, workQueue, args_list)
-    thread.start()
-    threads.append(thread)
-    threadID += 1
+if __name__ == '__main__':
+    # Create new threads
+    for tName in threadList:
+        thread = myThread(threadID, tName, workQueue, **args_list)
+        thread.start()
+        threads.append(thread)
+        threadID += 1
 
-# Fill the queue
-queueLock.acquire()
+    # Fill the queue
+    queueLock.acquire()
 
-for word in nameList:
-    workQueue.put(word)
+    for word in nameList:
+        workQueue.put(word)
 
-queueLock.release()
+    queueLock.release()
 
-# Wait for queue to empty
-while not workQueue.empty():
-    pass
+    # Wait for queue to empty
+    while not workQueue.empty():
+        pass
 
-# Notify threads it's time to exit
-exitFlag = 1
+    # Notify threads it's time to exit
+    exitFlag = 1
 
-# Wait for all threads to complete
-for t in threads:
-    t.join()
+    # Wait for all threads to complete
+    for t in threads:
+        t.join()
 
-print "Exiting Main Thread"
+    print "Exiting Main Thread"
