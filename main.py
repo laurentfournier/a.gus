@@ -105,7 +105,7 @@ if LOG:                                                                         
         with open(filename, 'r'): pass
     
     except Exception:                                                                   # If not, create them
-        os.system('mkdir {}/licor{}/'.format(LOG_DIR, DEVICE))
+        os.system('mkdir {}licor{}/'.format(LOG_DIR, DEVICE))
         pass
         
     with open(filename, 'w') as fp:
@@ -113,22 +113,33 @@ if LOG:                                                                         
         fp.write('\n')
 
         while LOOPS:
-            try:                
-                data = probe.read()                                                     # Read from device
-                fp.write(';'.join(data))                                                # Write data
-                fp.write('\n')
-                
-            except Exception as e:
-                if DEBUG: print ("ERROR: {}".format(e))
+            if (datetime.datetime.now().strftime("%S") == "59" and isDone == 0):
+                isDone = 1                
+                try:                
+                    data = probe.read()                                                     # Read from device
+                    fp.write(';'.join(data))                                                # Write data
+                    fp.write('\n')
                     
-            time.sleep(FREQ)                                                            # Sleep for FREQ seconds            
+                except Exception as e:
+                    if DEBUG: print ("ERROR: {}".format(e))
+
+            else:
+                isDone = 0
+                if not CONTINUOUS: LOOPS += 1                    
+
             if not CONTINUOUS: LOOPS -= 1
                 
         fp.close()
             
 else:                                                                                   # If logging is Disabled
     while LOOPS:
-        data = probe.read()
-        time.sleep(FREQ)        
+        if (datetime.datetime.now().strftime("%S") == "59" and isDone == 0):
+            isDone = 1
+            data = probe.read()
+
+        else:
+            isDone = 0
+            if not CONTINUOUS: LOOPS += 1
+
         if not CONTINUOUS: LOOPS -= 1
             
