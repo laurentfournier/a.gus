@@ -32,6 +32,11 @@
 - https://kivy.org/docs/api-kivy.html
 - https://pythonhosted.org/guidata/overview.html 
 
+### Threading:
+- https://docs.python.org/2/library/threading.html
+- https://openclassrooms.com/courses/apprenez-a-programmer-en-python/la-programmation-parallele-avec-threading
+- https://www.tutorialspoint.com/python/python_multithreading.htm
+
 ### Remote:
 - http://flask.pocoo.org/
 - http://cherrypy.org/
