@@ -1,5 +1,3 @@
-from ABE_ADCPi import ADCPi
-from ABE_helpers import ABEHelpers
 from smbus import SMBus
 from itertools import cycle
 from time import sleep
