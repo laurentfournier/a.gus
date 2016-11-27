@@ -32,6 +32,12 @@
 - https://kivy.org/docs/api-kivy.html
 - https://pythonhosted.org/guidata/overview.html 
 
+### SMBus:
+- http://wiki.erazor-zone.de/wiki:linux:python:smbus:doc
+- http://nullege.com/codes/search/smbus.SMBus
+- https://github.com/bjornt/pysmbus/blob/master/smbus.py
+- https://github.com/kplindegaard/smbus2
+
 ### Threading:
 - https://docs.python.org/2/library/threading.html
 - https://openclassrooms.com/courses/apprenez-a-programmer-en-python/la-programmation-parallele-avec-threading
