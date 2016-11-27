@@ -32,6 +32,11 @@
 - https://kivy.org/docs/api-kivy.html
 - https://pythonhosted.org/guidata/overview.html 
 
+### RealTime:
+- http://www.frank-durr.de/?p=203
+- https://rt.wiki.kernel.org/index.php/RT_PREEMPT_HOWTO
+- https://www.kernel.org/pub/linux/kernel/projects/rt/
+
 ### SMBus:
 - http://wiki.erazor-zone.de/wiki:linux:python:smbus:doc
 - http://nullege.com/codes/search/smbus.SMBus
