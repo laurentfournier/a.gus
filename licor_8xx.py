@@ -2,7 +2,7 @@
 
 '''
     IO data from/to a Licor 820 and 840a
-    
+
     Written by David H. Hagan, May 2016
     Modifications by Laurent Fournier, October 2016
 
@@ -53,7 +53,7 @@ HEADER     = []
   ##################
   # Initialisation #
   ##################
-  
+
 class Licor8xx:
     def __init__(self, **kwargs):
         self.port       = kwargs.pop('port',    PORT)
@@ -75,12 +75,12 @@ class Licor8xx:
             if   self.device == 820:  self._header = [ line.strip() for line in fp.get_cfg('li820write') ]
             elif self.device == 840:  self._header = [ line.strip() for line in fp.get_cfg('li840write') ]
             else: print ("Wrong device's Model")
-            
+
         else:                                                                           # Read from the device
             if   self.device == 820:  self._header = [ line.strip() for line in fp.get_cfg('li820read') ]
             elif self.device == 840:  self._header = [ line.strip() for line in fp.get_cfg('li840read') ]
             else: print ("Wrong device's Model")
-            
+
         fp.close()
 
     def connect(self):
@@ -88,11 +88,11 @@ class Licor8xx:
             self.con = serial.Serial(self.port, self.baud, timeout=self.timeout)        # Connect to serial device
             self.con.flushInput()
             self.con.flushOutput()
-            
+
         except Exception as e:
             self.con = None
             return e
-        
+
         return True
 
     def read(self):
@@ -112,7 +112,7 @@ class Licor8xx:
             print ("\nNew Data Point")
             for each in zip(self._header, res):
                 print (each[0], each[1])
-                
+
         return res
 
     def config_W(self):                                                                 # Write a complete instruction row
@@ -133,15 +133,15 @@ class Licor8xx:
         print ("Input: " + etree.tostring(conf, pretty_print = False))                  # Licor answer (ACK true or false)
         data_response = self.con.readline()
         print ("Output: " + data_response)
-    
+
     def config_R(self):                                                                 # Ask actual config
-        info = etree.Element(self._header[0])                                           # 
+        info = etree.Element(self._header[0])                                           #
         info.text = "?"                                                                 # <liXXX>?</liXXX>
-        
+
         self.con.write(etree.tostring(info, pretty_print = False))
         print ("Input: " + etree.tostring(info, pretty_print = False))
         data_response = self.con.readline()
         print ("Output: " + data_response)
-    
+
     def __repr__(self):
         return "Licor Model Li-{}".format(device_nr)
