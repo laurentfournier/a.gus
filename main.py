@@ -81,6 +81,7 @@ class myThread(threading.Thread):
         self.threadID = threadID
         self.name = name
         self.counter = counter
+        self.kwargs = kwargs
 
     def run(self):
         print "Starting " + self.name
