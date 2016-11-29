@@ -113,7 +113,7 @@ if LOG:                                                                         
         fp.write('\n')
 
         while LOOPS:
-            if (datetime.datetime.now().strftime("%S") == "59" and isDone == 0):
+            if (datetime.datetime.now().strftime("%S") == "00" and isDone == 0):
                 isDone = 1                
                 try:                
                     data = probe.read()                                                     # Read from device
@@ -133,7 +133,7 @@ if LOG:                                                                         
             
 else:                                                                                   # If logging is Disabled
     while LOOPS:
-        if (datetime.datetime.now().strftime("%S") == "59" and isDone == 0):
+        if (datetime.datetime.now().strftime("%S") == "00" and isDone == 0):
             isDone = 1
             data = probe.read()
 
