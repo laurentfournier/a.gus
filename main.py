@@ -135,7 +135,7 @@ def Licor(**kwargs):
             fp.write('\n')
 
             while LOOPS:
-                if (datetime.datetime.now().strftime("%S") == "59" and isDone == 0):
+                if (datetime.datetime.now().strftime("%S") == "00" and isDone == 0):
                     isDone = 1
                     try:
                         data = probe.read()                                                     # Read from device
@@ -155,44 +155,15 @@ def Licor(**kwargs):
 
     else:                                                                                   # If logging is Disabled
         while LOOPS:
-<<<<<<< d86ac455dd6cbda691d610feaafbecf3bfd179cc
             if (datetime.datetime.now().strftime("%S") == "00" and isDone == 0):
-                isDone = 1                
-                try:                
-                    data = probe.read()                                                     # Read from device
-                    fp.write(';'.join(data))                                                # Write data
-                    fp.write('\n')
-                    
-                except Exception as e:
-                    if DEBUG: print ("ERROR: {}".format(e))
-=======
-            if (datetime.datetime.now().strftime("%S") == "59" and isDone == 0):
                 isDone = 1
                 data = probe.read()
->>>>>>> 4a77396567bd2b4e122ad7facb0d4bbf8b1c092e
 
             else:
                 isDone = 0
                 if not CONTINUOUS: LOOPS += 1
 
             if not CONTINUOUS: LOOPS -= 1
-<<<<<<< d86ac455dd6cbda691d610feaafbecf3bfd179cc
-                
-        fp.close()
-            
-else:                                                                                   # If logging is Disabled
-    while LOOPS:
-        if (datetime.datetime.now().strftime("%S") == "00" and isDone == 0):
-            isDone = 1
-            data = probe.read()
-
-        else:
-            isDone = 0
-            if not CONTINUOUS: LOOPS += 1
-
-        if not CONTINUOUS: LOOPS -= 1
-            
-=======
 
 #-------------------------------------------------------------
 #----------------------- Main program ------------------------
@@ -224,4 +195,3 @@ for t in threads:
     t.join()
 
 print "Exiting Main Thread"
->>>>>>> 4a77396567bd2b4e122ad7facb0d4bbf8b1c092e
