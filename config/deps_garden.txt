@@ -1,0 +1,5 @@
+bar
+filebrowser
+graph
+mapview
+touchgraph
