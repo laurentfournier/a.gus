@@ -82,7 +82,7 @@ class myThread(threading.Thread):
         self.name = name
         self.counter = counter
         self.kwargs = kwargs
-        
+
     def run(self):
         print "Starting " + self.name
         Licor(**self.kwargs)
@@ -101,7 +101,7 @@ def Licor(**kwargs):
     LOG        = kwargs.pop('log',     LOG)
     LOOPS      = kwargs.pop('loops',   LOOPS)
     DEVICE     = kwargs.pop('device',  DEVICE)
-    
+
     try:                                                                                    # Connect to device
         if   DEVICE == 820 or DEVICE == 840: probe = Licor8xx(**args_list)
         elif DEVICE == 6262:                 probe = Licor6xx(**args_list)
@@ -145,26 +145,34 @@ def Licor(**kwargs):
             fp.write(';'.join(probe._header))                                               # Write headers
             fp.write('\n')
 
-            while LOOPS:
+            while not exitFlag:
                 if (datetime.datetime.now().strftime("%S") == "00"):
-                    try:
-                        data = probe.read()                                                 # Read from device
-                        fp.write(';'.join(data))                                            # Write data
-                        fp.write('\n')
+                    queueLock.acquire()
 
-                    except Exception as e:
-                        if DEBUG: print ("ERROR: {}".format(e))
+                    if not workQueue.empty():
+                        try:
+                            data = probe.read()                                             # Read from device
+                            fp.write(';'.join(data))                                        # Write data
+                            fp.write('\n')
 
-                if not CONTINUOUS: LOOPS -= 1
+                        except Exception as e:
+                            if DEBUG: print ("ERROR: {}".format(e))
+
+                    else:
+                        queueLock.release()
 
             fp.close()
 
     else:                                                                                   # If logging is Disabled
-        while LOOPS:
+        while not exitFlag:
             if (datetime.datetime.now().strftime("%S") == "00"):
-                data = probe.read()
+                queueLock.acquire()
 
-            if not CONTINUOUS: LOOPS -= 1
+                if not workQueue.empty():
+                    data = probe.read()
+
+                else:
+                    queueLock.release()
 
 #-------------------------------------------------------------
 #----------------------- Main program ------------------------
