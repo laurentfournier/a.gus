@@ -121,7 +121,7 @@ while True:
     LOG    = raw_input("Logging [True or False] : ")
     LOOPS  = raw_input("Loops [Data extractions #] : ")
     DEBUG  = raw_input("Debugging [True or False] : ")
-    continue
+    pass
 
 try:                                                                                    # Connect to device
     if   DEVICE == 820 or DEVICE == 840: probe = Licor8xx(**args_list)
