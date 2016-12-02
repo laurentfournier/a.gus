@@ -117,9 +117,9 @@ LOOPS      = kwargs.pop('loops',   LOOPS)
 DEVICE     = kwargs.pop('device',  DEVICE)'''
 
 while not exitFlag:
-    DEVICE = raw_input("Device [820 or 6262] : ")
+    DEVICE = int(raw_input("Device [820 or 6262] : "))
     LOG    = raw_input("Logging [True or False] : ")
-    LOOPS  = raw_input("Loops [Data extractions #] : ")
+    LOOPS  = int(raw_input("Loops [Data extractions #] : "))
     DEBUG  = raw_input("Debugging [True or False] : ")
     exitFlag = 1
 
