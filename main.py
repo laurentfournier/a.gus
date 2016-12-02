@@ -72,6 +72,7 @@ queueLock  = threading.Lock()
 workQueue  = Queue.Queue(10)
 threads    = []
 threadID   = 1
+
 #-------------------------------------------------------------
 #------------------ Create 'thread' object -------------------
 #-------------------------------------------------------------
@@ -85,123 +86,123 @@ class myThread(threading.Thread):
 
     def run(self):
         print "Starting " + self.name
-        Licor(**self.kwargs)
+        t_process(self.name, self.q)
         print "Finishing " + self.name
+
+def t_process(threadName, q):
+    while not exitFlag:
+        queueLock.acquire()
+
+        if not workQueue.empty():
+            data = q.get()
+            queueLock.release()
+            print "%s processing %s" % (threadName, data)
+
+        else:
+            queueLock.release()
+            
+        time.sleep(1)
 
 #-------------------------------------------------------------
 #----------------- Tests for Licor sensors -------------------
 #-------------------------------------------------------------
-def Licor(**kwargs):
-    PORT       = kwargs.pop('port',    PORT)
-    BAUD       = kwargs.pop('baud',    BAUD)
-    TIMEOUT    = kwargs.pop('timeout', TIMEOUT)
-    CONFIG     = kwargs.pop('config',  CONFIG)
-    CONTINUOUS = kwargs.pop('continuous', CONTINUOUS)
-    DEBUG      = kwargs.pop('debug',   DEBUG)
-    LOG        = kwargs.pop('log',     LOG)
-    LOOPS      = kwargs.pop('loops',   LOOPS)
-    DEVICE     = kwargs.pop('device',  DEVICE)
+PORT       = kwargs.pop('port',    PORT)
+BAUD       = kwargs.pop('baud',    BAUD)
+TIMEOUT    = kwargs.pop('timeout', TIMEOUT)
+CONFIG     = kwargs.pop('config',  CONFIG)
+CONTINUOUS = kwargs.pop('continuous', CONTINUOUS)
+DEBUG      = kwargs.pop('debug',   DEBUG)
+LOG        = kwargs.pop('log',     LOG)
+LOOPS      = kwargs.pop('loops',   LOOPS)
+DEVICE     = kwargs.pop('device',  DEVICE)
 
-    try:                                                                                    # Connect to device
-        if   DEVICE == 820 or DEVICE == 840: probe = Licor8xx(**args_list)
-        elif DEVICE == 6262:                 probe = Licor6xx(**args_list)
-        elif DEVICE == 7000:                 probe = Licor7xx(**args_list)
+try:                                                                                    # Connect to device
+    if   DEVICE == 820 or DEVICE == 840: probe = Licor8xx(**args_list)
+    elif DEVICE == 6262:                 probe = Licor6xx(**args_list)
+    elif DEVICE == 7000:                 probe = Licor7xx(**args_list)
 
-        probe.connect()
+    probe.connect()
+
+except Exception as e:
+    if DEBUG: print ("ERROR: {}".format(e))
+    sys.exit("Could not connect to the device")
+
+  ###################
+  # Writing routine #
+  ###################
+if CONFIG:                                                                              # Configure the device if required
+    try:
+        #probe.config_R()
+        probe.config_W()
 
     except Exception as e:
         if DEBUG: print ("ERROR: {}".format(e))
         sys.exit("Could not connect to the device")
 
-      ###################
-      # Writing routine #
-      ###################
-    if CONFIG:                                                                              # Configure the device if required
-        try:
-            #probe.config_R()
-            probe.config_W()
+  ###################
+  # Reading routine #
+  ###################
+filename = 'licor{0}/licor{0}-data-{1}.csv'.format(DEVICE, datetime.datetime.now())
 
-        except Exception as e:
-            if DEBUG: print ("ERROR: {}".format(e))
-            sys.exit("Could not connect to the device")
+if LOG_DIR:                                                                             # If LOG_DIR is set, add it to filename
+    filename = os.path.join(LOG_DIR, filename)
 
-      ###################
-      # Reading routine #
-      ###################
-    filename = 'licor{0}/licor{0}-data-{1}.csv'.format(DEVICE, datetime.datetime.now())
+if LOG:                                                                                 # If logging is enabled
+    try:                                                                                # Verify if directory already exists
+        with open(filename, 'r'): pass
 
-    if LOG_DIR:                                                                             # If LOG_DIR is set, add it to filename
-        filename = os.path.join(LOG_DIR, filename)
-
-    if LOG:                                                                                 # If logging is enabled
-        try:                                                                                # Verify if directory already exists
-            with open(filename, 'r'): pass
-
-        except Exception:                                                                   # If not, create them
-            os.system('mkdir {}licor{}/'.format(LOG_DIR, DEVICE))
-            pass
-
-        with open(filename, 'w') as fp:
-            fp.write(';'.join(probe._header))                                               # Write headers
-            fp.write('\n')
-
-            while not exitFlag:
-                if (datetime.datetime.now().strftime("%S") == "00"):
-                    queueLock.acquire()
-
-                    if not workQueue.empty():
-                        try:
-                            data = probe.read()                                             # Read from device
-                            fp.write(';'.join(data))                                        # Write data
-                            fp.write('\n')
-
-                        except Exception as e:
-                            if DEBUG: print ("ERROR: {}".format(e))
-
-                    else:
-                        queueLock.release()
-
-            fp.close()
-
-    else:                                                                                   # If logging is Disabled
-        while not exitFlag:
-            if (datetime.datetime.now().strftime("%S") == "00"):
-                queueLock.acquire()
-
-                if not workQueue.empty():
-                    data = probe.read()
-
-                else:
-                    queueLock.release()
-
-#-------------------------------------------------------------
-#----------------------- Main program ------------------------
-#-------------------------------------------------------------
-if __name__ == '__main__':
-    # Create new threads
-    for tName in threadList:
-        thread = myThread(threadID, tName, workQueue, **args_list)
-        thread.start()
-        threads.append(thread)
-        threadID += 1
-
-    # Fill the queue
-    queueLock.acquire()
-
-    for word in nameList:
-        workQueue.put(word)
-
-    queueLock.release()
-
-    # Wait for queue to empty
-    while not workQueue.empty():
+    except Exception:                                                                   # If not, create them
+        os.system('mkdir {}licor{}/'.format(LOG_DIR, DEVICE))
         pass
 
-    # Notify threads it's time to exit
-    exitFlag = 1
+    with open(filename, 'w') as fp:
+        fp.write(';'.join(probe._header))                                               # Write headers
+        fp.write('\n')
 
-    # Wait for all threads to complete
-    for t in threads:
-        t.join()
+        if (datetime.datetime.now().strftime("%S") == "00"):
+            try:
+                data = probe.read()                                             # Read from device
+                fp.write(';'.join(data))                                        # Write data
+                fp.write('\n')
 
-    print "Exiting Main Thread"
+            except Exception as e:
+                if DEBUG: print ("ERROR: {}".format(e))
+
+        fp.close()
+
+else:                                                                                   # If logging is Disabled
+    if (datetime.datetime.now().strftime("%S") == "00"):
+        data = probe.read()
+
+'''
+#-------------------------------------------------------------
+#-------------------------- Sample ---------------------------
+#-------------------------------------------------------------
+# Create new threads
+for tName in threadList:
+    thread = myThread(threadID, tName, workQueue, **args_list)
+    thread.start()
+    threads.append(thread)
+    threadID += 1
+
+# Fill the queue
+queueLock.acquire()
+
+for word in nameList:
+    workQueue.put(word)
+
+queueLock.release()
+
+# Wait for queue to empty
+while not workQueue.empty():
+    pass
+
+# Notify threads it's time to exit
+exitFlag = 1
+
+# Wait for all threads to complete
+for t in threads:
+    t.join()
+
+print "Exiting Main Thread"
+'''
