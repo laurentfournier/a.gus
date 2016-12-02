@@ -100,13 +100,13 @@ def t_process(threadName, q):
 
         else:
             queueLock.release()
-            
+
         time.sleep(1)
 
 #-------------------------------------------------------------
 #----------------- Tests for Licor sensors -------------------
 #-------------------------------------------------------------
-PORT       = kwargs.pop('port',    PORT)
+'''PORT       = kwargs.pop('port',    PORT)
 BAUD       = kwargs.pop('baud',    BAUD)
 TIMEOUT    = kwargs.pop('timeout', TIMEOUT)
 CONFIG     = kwargs.pop('config',  CONFIG)
@@ -114,7 +114,14 @@ CONTINUOUS = kwargs.pop('continuous', CONTINUOUS)
 DEBUG      = kwargs.pop('debug',   DEBUG)
 LOG        = kwargs.pop('log',     LOG)
 LOOPS      = kwargs.pop('loops',   LOOPS)
-DEVICE     = kwargs.pop('device',  DEVICE)
+DEVICE     = kwargs.pop('device',  DEVICE)'''
+
+while True:
+    DEVICE = raw_input("Device [820 or 6262] : ")
+    LOG    = raw_input("Logging [True or False] : ")
+    LOOPS  = raw_input("Loops [Data extractions #] : ")
+    DEBUG  = raw_input("Debugging [True or False] : ")
+    continue
 
 try:                                                                                    # Connect to device
     if   DEVICE == 820 or DEVICE == 840: probe = Licor8xx(**args_list)
