@@ -117,13 +117,13 @@ LOOPS      = kwargs.pop('loops',   LOOPS)
 DEVICE     = kwargs.pop('device',  DEVICE)'''
 
 while not exitFlag:
-    DEVICE = int(raw_input("Device [820 or 6262] : "))
-    LOG    = raw_input("Logging [True or False] : ")
-    LOOPS  = int(raw_input("Loops [Data extractions #] : "))
-    DEBUG  = raw_input("Debugging [True or False] : ")
+    args_list['device'] = int(raw_input("Device [820 or 6262] : "))
+    args_list['log']    = raw_input("Logging [True or False] : ")
+    args_list['loops']  = int(raw_input("Loops [Data extractions #] : "))
+    args_list['debug']  = raw_input("Debugging [True or False] : ")
     exitFlag = 1
 
-print ("DEVICE={} LOG={} LOOPS={} DEBUG={}").format(DEVICE, LOG, LOOPS, DEBUG)
+print ("DEVICE={} LOG={} LOOPS={} DEBUG={}\n{}").format(DEVICE, LOG, LOOPS, DEBUG, args_list)
 
 try:                                                                                    # Connect to device
     if   DEVICE == 820 or DEVICE == 840: probe = Licor8xx(**args_list)
