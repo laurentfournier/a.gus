@@ -12,6 +12,8 @@ import serial
 import argparse
 import threading
 import Queue
+import signal
+signal.signal(signal.SIGINT, signal.default_int_handler)
 
 from bs4         import BeautifulSoup as bs
 from lxml        import etree
@@ -23,6 +25,14 @@ from tools     import *
 from licor_6xx import Licor6xx
 from licor_7xx import Licor7xx
 from licor_8xx import Licor8xx
+
+# GUI
+from kivy.app import App
+from kivy.clock import Clock
+from kivy.config import Config
+Config.set('kivy', 'keyboard_mode', 'systemandmulti')
+from kivy.uix.button import Button
+from kivy.uix.widget import Widget
 
 #-------------------------------------------------------------
 #------------------ Open configurations ----------------------
@@ -65,6 +75,8 @@ args_list  = { 'port' : PORT,    'baud': BAUD,             'timeout': TIMEOUT,
                'config': CONFIG, 'continuous': CONTINUOUS, 'debug': DEBUG,
                'device': DEVICE, 'log': LOG,               'loops': LOOPS }
 
+data = 0000.00
+
 exitFlag   = 0
 threadList = [ "Thread-1", "Thread-2" ]
 nameList   = ["One", "Two", "Three", "Four", "Five"]
@@ -76,7 +88,7 @@ threadID   = 1
 #-------------------------------------------------------------
 #------------------ Create 'thread' object -------------------
 #-------------------------------------------------------------
-class myThread(threading.Thread):
+'''class myThread(threading.Thread):
     def __init__(self, threadID, name, counter, kwargs):
         threading.Thread.__init__(self)
         self.threadID = threadID
@@ -106,16 +118,6 @@ def t_process(threadName, q):
 #-------------------------------------------------------------
 #----------------- Tests for Licor sensors -------------------
 #-------------------------------------------------------------
-'''PORT       = kwargs.pop('port',    PORT)
-BAUD       = kwargs.pop('baud',    BAUD)
-TIMEOUT    = kwargs.pop('timeout', TIMEOUT)
-CONFIG     = kwargs.pop('config',  CONFIG)
-CONTINUOUS = kwargs.pop('continuous', CONTINUOUS)
-DEBUG      = kwargs.pop('debug',   DEBUG)
-LOG        = kwargs.pop('log',     LOG)
-LOOPS      = kwargs.pop('loops',   LOOPS)
-DEVICE     = kwargs.pop('device',  DEVICE)'''
-
 while not exitFlag:
     args_list['device'] = int(raw_input("Device [820 or 6262] : "))
     args_list['log']    = raw_input("Logging [True or False] : ")
@@ -123,7 +125,18 @@ while not exitFlag:
     args_list['debug']  = raw_input("Debugging [True or False] : ")
     exitFlag = 1
 
-print ("DEVICE={} LOG={} LOOPS={} DEBUG={}\n{}").format(DEVICE, LOG, LOOPS, DEBUG, args_list)
+print ("DEVICE={} LOG={} LOOPS={} DEBUG={}\n{}").format(DEVICE, LOG, LOOPS, DEBUG, args_list)'''
+
+class GuiData(Widget):
+    val = 0.0
+    
+class GuiSec(Widget):
+    def build(self):
+        value = 0.0
+        return Button(text=str(valuevalue), background_color=(0, 0, 1, 1), font_size=100)
+
+    def update(self, val):
+        self.value = val
 
 try:                                                                                    # Connect to device
     if   DEVICE == 820 or DEVICE == 840: probe = Licor8xx(**args_list)
@@ -132,9 +145,15 @@ try:                                                                            
 
     probe.connect()
 
-except Exception as e:
+except (Exception, KeyboardInterrupt) as e:
     if DEBUG: print ("ERROR: {}".format(e))
     sys.exit("Could not connect to the device")
+
+try:
+    GuiApp().run()
+
+except KeyboardInterrupt:
+    GuiApp().stop()
 
   ###################
   # Writing routine #
@@ -168,20 +187,32 @@ if LOG:                                                                         
         fp.write(';'.join(probe._header))                                               # Write headers
         fp.write('\n')
 
-        if (datetime.datetime.now().strftime("%S") == "00"):
-            try:
-                data = probe.read()                                             # Read from device
-                fp.write(';'.join(data))                                        # Write data
-                fp.write('\n')
+        while LOOPS:
+            if (datetime.datetime.now().strftime("%S") == "00"):
+                try:
+                    data = probe.read()                                                 # Read from device
+                    fp.write(';'.join(data))                                            # Write data
+                    fp.write('\n')
 
-            except Exception as e:
-                if DEBUG: print ("ERROR: {}".format(e))
+                    while (datetime.datetime.now().strftime("%S") == "00"):
+                        pass
 
+                except Exception as e:
+                    if DEBUG: print ("ERROR: {}".format(e))
+
+            if not CONTINUOUS: LOOPS -= 1
+                
         fp.close()
 
 else:                                                                                   # If logging is Disabled
-    if (datetime.datetime.now().strftime("%S") == "00"):
-        data = probe.read()
+    while LOOPS:
+        if (datetime.datetime.now().strftime("%S") == "00" and isDone == 0):
+            data = probe.read()
+
+            while (datetime.datetime.now().strftime("%S") == "00"):
+                pass
+
+        if not CONTINUOUS: LOOPS -= 1
 
 '''
 #-------------------------------------------------------------
