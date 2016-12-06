@@ -25,14 +25,14 @@ from tools     import *
 from licor_6xx import Licor6xx
 from licor_7xx import Licor7xx
 from licor_8xx import Licor8xx
-
+'''
 # GUI
 from kivy.app import App
 from kivy.clock import Clock
 from kivy.config import Config
 Config.set('kivy', 'keyboard_mode', 'systemandmulti')
 from kivy.uix.button import Button
-from kivy.uix.widget import Widget
+from kivy.uix.widget import Widget'''
 
 #-------------------------------------------------------------
 #------------------ Open configurations ----------------------
@@ -60,7 +60,7 @@ CONTINUOUS = args.continuous
 DEBUG      = args.debug
 DEVICE     = args.model
 LOG        = args.logging
-LOOPS      = args.loops                                                                     # Nr of data extractions
+LOOPS      = args.loops                                                                 # Nr of data extractions
 
 FREQ       = 5
 PORT       = '/dev/ttyUSB0'
@@ -75,7 +75,8 @@ args_list  = { 'port' : PORT,    'baud': BAUD,             'timeout': TIMEOUT,
                'config': CONFIG, 'continuous': CONTINUOUS, 'debug': DEBUG,
                'device': DEVICE, 'log': LOG,               'loops': LOOPS }
 
-data = 0000.00
+data  = 0000.00
+count = 0
 
 exitFlag   = 0
 threadList = [ "Thread-1", "Thread-2" ]
@@ -113,112 +114,12 @@ def t_process(threadName, q):
         else:
             queueLock.release()
 
-        time.sleep(1)
+        time.sleep(1)'''
 
-#-------------------------------------------------------------
-#----------------- Tests for Licor sensors -------------------
-#-------------------------------------------------------------
-while not exitFlag:
-    args_list['device'] = int(raw_input("Device [820 or 6262] : "))
-    args_list['log']    = raw_input("Logging [True or False] : ")
-    args_list['loops']  = int(raw_input("Loops [Data extractions #] : "))
-    args_list['debug']  = raw_input("Debugging [True or False] : ")
-    exitFlag = 1
-
-print ("DEVICE={} LOG={} LOOPS={} DEBUG={}\n{}").format(DEVICE, LOG, LOOPS, DEBUG, args_list)'''
-
-class GuiData(Widget):
-    val = 0.0
-    
-class GuiSec(Widget):
-    def build(self):
-        value = 0.0
-        return Button(text=str(valuevalue), background_color=(0, 0, 1, 1), font_size=100)
-
-    def update(self, val):
-        self.value = val
-
-try:                                                                                    # Connect to device
-    if   DEVICE == 820 or DEVICE == 840: probe = Licor8xx(**args_list)
-    elif DEVICE == 6262:                 probe = Licor6xx(**args_list)
-    elif DEVICE == 7000:                 probe = Licor7xx(**args_list)
-
-    probe.connect()
-
-except (Exception, KeyboardInterrupt) as e:
-    if DEBUG: print ("ERROR: {}".format(e))
-    sys.exit("Could not connect to the device")
-
-try:
-    GuiApp().run()
-
-except KeyboardInterrupt:
-    GuiApp().stop()
-
-  ###################
-  # Writing routine #
-  ###################
-if CONFIG:                                                                              # Configure the device if required
-    try:
-        #probe.config_R()
-        probe.config_W()
-
-    except Exception as e:
-        if DEBUG: print ("ERROR: {}".format(e))
-        sys.exit("Could not connect to the device")
-
-  ###################
-  # Reading routine #
-  ###################
-filename = 'licor{0}/licor{0}-data-{1}.csv'.format(DEVICE, datetime.datetime.now())
-
-if LOG_DIR:                                                                             # If LOG_DIR is set, add it to filename
-    filename = os.path.join(LOG_DIR, filename)
-
-if LOG:                                                                                 # If logging is enabled
-    try:                                                                                # Verify if directory already exists
-        with open(filename, 'r'): pass
-
-    except Exception:                                                                   # If not, create them
-        os.system('mkdir {}licor{}/'.format(LOG_DIR, DEVICE))
-        pass
-
-    with open(filename, 'w') as fp:
-        fp.write(';'.join(probe._header))                                               # Write headers
-        fp.write('\n')
-
-        while LOOPS:
-            if (datetime.datetime.now().strftime("%S") == "00"):
-                try:
-                    data = probe.read()                                                 # Read from device
-                    fp.write(';'.join(data))                                            # Write data
-                    fp.write('\n')
-
-                    while (datetime.datetime.now().strftime("%S") == "00"):
-                        pass
-
-                except Exception as e:
-                    if DEBUG: print ("ERROR: {}".format(e))
-
-            if not CONTINUOUS: LOOPS -= 1
-                
-        fp.close()
-
-else:                                                                                   # If logging is Disabled
-    while LOOPS:
-        if (datetime.datetime.now().strftime("%S") == "00" and isDone == 0):
-            data = probe.read()
-
-            while (datetime.datetime.now().strftime("%S") == "00"):
-                pass
-
-        if not CONTINUOUS: LOOPS -= 1
-
-'''
 #-------------------------------------------------------------
 #-------------------------- Sample ---------------------------
 #-------------------------------------------------------------
-# Create new threads
+'''# Create new threads
 for tName in threadList:
     thread = myThread(threadID, tName, workQueue, **args_list)
     thread.start()
@@ -246,3 +147,101 @@ for t in threads:
 
 print "Exiting Main Thread"
 '''
+
+#-------------------------------------------------------------
+#----------------- Tests for Licor sensors -------------------
+#-------------------------------------------------------------
+def licor(**kwargs):
+    config     = kwargs.pop('config',  CONFIG)
+    continuous = kwargs.pop('continuous', CONTINUOUS)
+    debug      = kwargs.pop('debug',   DEBUG)
+    log        = kwargs.pop('log',     LOG)
+    loops      = kwargs.pop('loops',   LOOPS)
+    device     = kwargs.pop('device',  DEVICE)
+
+    try:                                                                                # Connect to device
+        if   device == 820 or device == 840: probe = Licor8xx(**kwargs)
+        elif device == 6262:                 probe = Licor6xx(**kwargs)
+        elif device == 7000:                 probe = Licor7xx(**kwargs)
+
+        probe.connect()
+
+    except Exception as e:
+        if debug: print ("ERROR: {}".format(e))
+        sys.exit("Could not connect to the device")
+
+      ###################
+      # Writing routine #
+      ###################
+    if config:                                                                          # Configure the device if required
+        try:
+            #probe.config_R()
+            probe.config_W()
+
+        except Exception as e:
+            if debug: print ("ERROR: {}".format(e))
+            sys.exit("Could not connect to the device")
+
+      ###################
+      # Reading routine #
+      ###################
+    date_time = datetime.datetime.now()
+    filename = 'licor{0}/licor{0}-data-{1}.csv'.format(device, date_time)
+
+    if LOG_DIR:                                                                         # If LOG_DIR is set, add it to filename
+        filename = os.path.join(LOG_DIR, filename)
+
+    if log:                                                                             # If logging is enabled
+        try:                                                                            # Verify if directory already exists
+            with open(filename, 'r'): pass
+
+        except Exception:                                                               # If not, create them
+            os.system('mkdir {}licor{}/'.format(LOG_DIR, device))
+            pass
+
+        with open(filename, 'w') as fp:
+            fp.write(';'.join(probe._header))                                           # Write headers
+            fp.write('\n')
+
+            while loops:
+                if (datetime.datetime.now().strftime("%S") == "00"):
+                    try:
+                        data = probe.read()                                             # Read from device
+                        fp.write(';'.join(data))                                        # Write data
+                        fp.write('\n')
+
+                        while (datetime.datetime.now().strftime("%S") == "00"):
+                            pass
+
+                    except Exception as e:
+                        if debug: print ("ERROR: {}".format(e))
+                        
+                    except KeyboardInterrupt:                                           # CTRL+C catcher - Not working
+                        sys.exit("Program terminated properly")
+
+                if not continuous: loops -= 1
+                    
+            fp.close()
+
+    else:                                                                               # If logging is Disabled
+        while loops:
+            if (datetime.datetime.now().strftime("%S") == "00"):
+                try:
+                    data = probe.read()
+
+                    while (datetime.datetime.now().strftime("%S") == "00"):
+                        pass
+
+                except Exception as e:
+                    if debug: print ("ERROR: {}".format(e))
+                        
+                except KeyboardInterrupt:                                               # CTRL+C catcher - Not working
+                    sys.exit("Program terminated properly")
+
+            if not continuous: loops -= 1
+
+#-------------------------------------------------------------
+#----------------------- Main program ------------------------
+#-------------------------------------------------------------
+if __name__ == '__main__':
+    licor(**args_list)
