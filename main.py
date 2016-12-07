@@ -215,11 +215,11 @@ def licor(cnt, **kwargs):
 #-------------------------------------------------------------
 if __name__ == '__main__':
     while not exitFlag:
-        if (li8xStatus is True): print ("Li820:  {}").format(li8xValue = probe.get_data())
+        if (li8xStatus is True): print ("Li820:  {}").format(li8xValue = probe[cnt1].get_data())
         else: print ("Li820:  Inactive")
-        if (li6xStatus is True): print ("Li6262: {}").format(li6xValue = probe.get_data())
+        if (li6xStatus is True): print ("Li6262: {}").format(li6xValue = probe[cnt2].get_data())
         else: print ("Li6262: Inactive")
-        if (i2cStatus  is True): print ("I2C:    {}").format(i2cValue = probe.get_data())
+        if (i2cStatus  is True): print ("I2C:    {}").format(i2cValue  = probe[cnt3].get_data())
         else: print ("I2C:    Inactive")
         print ("_______________________________________________________________")
 
@@ -238,18 +238,21 @@ if __name__ == '__main__':
         elif user_input is '1':
             li8xStatus += 1
             cnt += 1
+            cnt1 = cnt
             args_list['device'] = 820
             licor(cnt, **args_list)
 
         elif user_input is '2':
             li6xStatus += 1
             cnt += 1
+            cnt2 = cnt
             args_list['device'] = 6262
             licor(cnt, **args_list)
 
         elif user_input is '3':
             i2cStatus += 1
             cnt += 1
+            cnt3 = cnt
             todo
 
         elif user_input is 'q' or 'Q':
