@@ -108,6 +108,8 @@ class Licor8xx:
             res = [ datetime.datetime.now().strftime('%Y-%m-%d'), datetime.datetime.now().strftime('%H:%M:%S'),
                     raw.celltemp.string, raw.cellpres.string, raw.co2.string, raw.h2o.string, raw.h2odewpoint, ]
 
+        self.res = res
+
         if self.debug:
             print ("\nNew Data Point")
             for each in zip(self._header, res):
@@ -142,6 +144,9 @@ class Licor8xx:
         print ("Input: " + etree.tostring(info, pretty_print = False))
         data_response = self.con.readline()
         print ("Output: " + data_response)
+
+    def get_data(self):
+        return self.res
 
     def __repr__(self):
         return "Licor Model Li-{}".format(device_nr)
