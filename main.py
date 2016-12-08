@@ -10,9 +10,9 @@ import os, sys, subprocess
 import time, datetime
 import serial
 import argparse
-import threading
-import Queue
-import signal
+
+from threading import *
+import Queue, signal
 signal.signal(signal.SIGINT, signal.default_int_handler)
 
 from bs4         import BeautifulSoup as bs
@@ -21,7 +21,6 @@ from collections import Counter
 
 # External libraries
 import file_manager as fm
-#from tools     import *
 from licor_6xx import Licor6xx
 from licor_7xx import Licor7xx
 from licor_8xx import Licor8xx
@@ -45,7 +44,7 @@ from kivy.uix.widget import Widget'''
 parser = argparse.ArgumentParser(description = '')
 parser.add_argument('-c', '--continuous', type=bool, help='No outputs limitation', default=True,  choices=[True, False])
 parser.add_argument('-C', '--config',     type=bool, help='Configuration mode',    default=False, choices=[True, False])
-parser.add_argument('-d', '--debug',      type=bool, help='Debugging mode',        default=True,  choices=[True, False])
+parser.add_argument('-d', '--debug',      type=bool, help='Debugging mode',        default=False, choices=[True, False])
 parser.add_argument('-l', '--loops',      type=int,  help='Number of outputs',     default=5)
 parser.add_argument('-L', '--logging',    type=bool, help='Storing in .CSV files', default=True,  choices=[True, False])
 parser.add_argument('-m', '--model',      type=int,  help='Select device model',   default=6262,  choices=[820, 840, 6262, 7000])
@@ -79,6 +78,8 @@ data     = 0.0
 cnt      = 0
 exitFlag = 0
 
+probe      = []
+t_buffer   = []
 li8xStatus = 0
 li8xValue  = 0
 li6xStatus = 0
@@ -88,7 +89,7 @@ i2cValue   = 0
 
 threadList = [ "Thread-1", "Thread-2" ]
 nameList   = ["One", "Two", "Three", "Four", "Five"]
-queueLock  = threading.Lock()
+queueLock  = Lock()
 workQueue  = Queue.Queue(10)
 threads    = []
 threadID   = 1
@@ -96,9 +97,9 @@ threadID   = 1
 #-------------------------------------------------------------
 #------------------ Create 'thread' object -------------------
 #-------------------------------------------------------------
-class myThread(threading.Thread):
+class myThread(Thread):
     def __init__(self, threadID, name, counter, **kwargs):
-        threading.Thread.__init__(self)
+        Thread.__init__(self)
         self.threadID = threadID
         self.name = name
         self.counter = counter
@@ -124,19 +125,23 @@ def t_process(threadName, q):
 #-------------------------------------------------------------
 #----------------- Tests for Licor sensors -------------------
 #-------------------------------------------------------------
-def licor(cnt, **kwargs):
-    config     = kwargs.pop('config',  CONFIG)
-    continuous = kwargs.pop('continuous', CONTINUOUS)
-    debug      = kwargs.pop('debug',   DEBUG)
-    log        = kwargs.pop('log',     LOG)
-    loops      = kwargs.pop('loops',   LOOPS)
-    device     = kwargs.pop('device',  DEVICE)
-
+def licor(**kwargs):
+    config     = kwargs['config']
+    continuous = kwargs['continuous']
+    debug      = kwargs['debug']
+    log        = kwargs['log']
+    loops      = kwargs['loops']
+    device     = kwargs['device']
+    ids        = kwargs['id']
+    
     try:                                                                                # Connect to device
-        if   device == 820 or device == 840: probe[cnt] = Licor8xx(**kwargs)
-        elif device == 6262:                 probe[cnt] = Licor6xx(**kwargs)
-        elif device == 7000:                 probe[cnt] = Licor7xx(**kwargs)
-        probe[cnt].connect()
+        global probe
+        
+        if   device == 820 or device == 840: probe.append(Licor8xx(**kwargs))
+        elif device == 6262:                 probe.append(Licor6xx(**kwargs))
+        elif device == 7000:                 probe.append(Licor7xx(**kwargs))
+        
+        probe[ids].connect()
 
     except Exception as e:
         if debug: print ("ERROR: {}".format(e))
@@ -147,8 +152,8 @@ def licor(cnt, **kwargs):
       ###################
     if config:                                                                          # Configure the device if required
         try:
-            #probe.config_R()
-            probe.config_W()
+            #probe[cnt].config_R()
+            probe[cnt].config_W()
 
         except Exception as e:
             if debug: print ("ERROR: {}".format(e))
@@ -157,30 +162,27 @@ def licor(cnt, **kwargs):
       ###################
       # Reading routine #
       ###################
+    global t_buffer
     date_time = datetime.datetime.now()
-    filename = 'licor{0}/licor{0}-data-{1}.csv'.format(device, date_time)
-
-    if LOG_DIR:                                                                         # If LOG_DIR is set, add it to filename
-        filename = os.path.join(LOG_DIR, filename)
+    pathname = '{}licor{}/'.format(LOG_DIR, device)
+    filename = '{}licor{}-data-{}.csv'.format(pathname, device, date_time)
+    
+    if not os.path.isdir(pathname):                                                     # Verify if directory already exists
+        os.system('mkdir {}'.format(pathname))
 
     if log:                                                                             # If logging is enabled
-        try:                                                                            # Verify if directory already exists
-            with open(filename, 'r'): pass
-
-        except Exception:                                                               # If not, create them
-            os.system('mkdir {}licor{}/'.format(LOG_DIR, device))
-            pass
-
         with open(filename, 'w') as fp:
-            fp.write(';'.join(probe._header))                                           # Write headers
+            fp.write(';'.join(probe[ids]._header))                                      # Write headers
             fp.write('\n')
 
             while loops:
                 if (datetime.datetime.now().strftime("%S") == "00"):
                     try:
-                        data = probe.read()                                             # Read from device
+                        data = probe[ids].read()                                        # Read from device
                         fp.write(';'.join(data))                                        # Write data
                         fp.write('\n')
+                        t_buffer[0] = data
+                        
                         while (datetime.datetime.now().strftime("%S") == "00"):
                             pass
 
@@ -198,7 +200,7 @@ def licor(cnt, **kwargs):
         while loops:
             if (datetime.datetime.now().strftime("%S") == "00"):
                 try:
-                    data = probe.read()
+                    data = probe[ids].read()
                     while (datetime.datetime.now().strftime("%S") == "00"):
                         pass
 
@@ -214,14 +216,15 @@ def licor(cnt, **kwargs):
 #----------------------- Main program ------------------------
 #-------------------------------------------------------------
 if __name__ == '__main__':
+    os.system('clear')
     while not exitFlag:
-        if (li8xStatus is True): print ("Li820:  {}").format(li8xValue = probe[cnt1].get_data())
+        if (li8xStatus == True): print "Li820:  {}".format(t_buffer[0]) #(("Li820:  {}").format(probe[cnt1].get_data())
         else: print ("Li820:  Inactive")
-        if (li6xStatus is True): print ("Li6262: {}").format(li6xValue = probe[cnt2].get_data())
+        if (li6xStatus == True): print "Li6262: {}".format(t_buffer[0]) #(("Li6262: {}").format(probe[cnt2].get_data())
         else: print ("Li6262: Inactive")
-        if (i2cStatus  is True): print ("I2C:    {}").format(i2cValue  = probe[cnt3].get_data())
+        if (i2cStatus  == True): print "I2C:    {}".format(t_buffer[0]) #(("I2C:    {}").format(probe[cnt3].get_data())
         else: print ("I2C:    Inactive")
-        print ("_______________________________________________________________")
+        print ("_______________________________________________________________\n")
 
         user_input = raw_input("\t|-----------------|\n"
                                "\t| 0. Refresh      |\n"
@@ -232,31 +235,42 @@ if __name__ == '__main__':
                                "\t| --------------- |\n"
                                "\t| Q. Exit Program |\n"
                                "\t|-----------------|\n")
-        os.system('cls')
+        os.system('clear')
 
         if   user_input is '0': pass
+        
         elif user_input is '1':
-            li8xStatus += 1
-            cnt += 1
-            cnt1 = cnt
+            li8xStatus = 1
             args_list['device'] = 820
-            licor(cnt, **args_list)
+            args_list['id'] = cnt1 = cnt
+            a = Thread(target=licor, kwargs=args_list)
+            a.start()
+            cnt += 1
 
         elif user_input is '2':
-            li6xStatus += 1
-            cnt += 1
-            cnt2 = cnt
             args_list['device'] = 6262
-            licor(cnt, **args_list)
-
-        elif user_input is '3':
-            i2cStatus += 1
+            args_list['id'] = cnt2 = cnt
             cnt += 1
-            cnt3 = cnt
+            
+            b = Thread(target=licor, kwargs=args_list)
+            
+            if not li6xStatus:
+                li6xStatus = 1
+                b.start()
+                
+            else:
+                li6xStatus = 0
+                b.exit()
+            
+        elif user_input is '3':
+            i2cStatus = 1
+            cnt += 1
+            args_list['id'] = cnt3 = cnt
             todo
 
         elif user_input is 'q' or 'Q':
             exitFlag = 1
+            
         else: pass
 
 #-------------------------------------------------------------
