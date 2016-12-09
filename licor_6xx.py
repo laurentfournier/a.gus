@@ -69,13 +69,13 @@ class Licor6xx:
         fp = fm.fManager('config/.cfg', 'r')
         fp.open()
         fp.cfg_loader()
-
+        
         if self.config:                                                                 # Write to the device
             self._header = [ line.strip() for line in fp.get_cfg('li6262write') ]
 
         else:                                                                           # Read from the device
             self._header = [ line.strip() for line in fp.get_cfg('li6262read') ]
-
+        
         fp.close()
 
     def connect(self):

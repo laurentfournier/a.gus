@@ -11,8 +11,9 @@ import time, datetime
 import serial
 import argparse
 
-from threading import *
-import Queue, signal
+from multiprocessing import Process, Queue
+
+import signal
 signal.signal(signal.SIGINT, signal.default_int_handler)
 
 from bs4         import BeautifulSoup as bs
@@ -86,41 +87,6 @@ li6xStatus = 0
 li6xValue  = 0
 i2cStatus  = 0
 i2cValue   = 0
-
-threadList = [ "Thread-1", "Thread-2" ]
-nameList   = ["One", "Two", "Three", "Four", "Five"]
-queueLock  = Lock()
-workQueue  = Queue.Queue(10)
-threads    = []
-threadID   = 1
-
-#-------------------------------------------------------------
-#------------------ Create 'thread' object -------------------
-#-------------------------------------------------------------
-class myThread(Thread):
-    def __init__(self, threadID, name, counter, **kwargs):
-        Thread.__init__(self)
-        self.threadID = threadID
-        self.name = name
-        self.counter = counter
-        self.kwargs = kwargs
-
-    def run(self):
-        print "Starting " + self.name
-        t_process(self.name, self.q)
-        print "Finishing " + self.name
-
-def t_process(threadName, q):
-    while not exitFlag:
-        queueLock.acquire()
-
-        if not workQueue.empty():
-            data = q.get()
-            queueLock.release()
-            print "%s processing %s" % (threadName, data)
-        else: queueLock.release()
-
-        time.sleep(1)
 
 #-------------------------------------------------------------
 #----------------- Tests for Licor sensors -------------------
@@ -218,11 +184,11 @@ def licor(**kwargs):
 if __name__ == '__main__':
     os.system('clear')
     while not exitFlag:
-        if (li8xStatus == True): print "Li820:  {}".format(t_buffer[0]) #(("Li820:  {}").format(probe[cnt1].get_data())
+        if (li8xStatus == True): print "Li820:  Active" #(("Li820:  {}").format(probe[cnt1].get_data())
         else: print ("Li820:  Inactive")
-        if (li6xStatus == True): print "Li6262: {}".format(t_buffer[0]) #(("Li6262: {}").format(probe[cnt2].get_data())
+        if (li6xStatus == True): print "Li6262: Active" #(("Li6262: {}").format(probe[cnt2].get_data())
         else: print ("Li6262: Inactive")
-        if (i2cStatus  == True): print "I2C:    {}".format(t_buffer[0]) #(("I2C:    {}").format(probe[cnt3].get_data())
+        if (i2cStatus  == True): print "I2C:    Active" #(("I2C:    {}").format(probe[cnt3].get_data())
         else: print ("I2C:    Inactive")
         print ("_______________________________________________________________\n")
 
@@ -243,7 +209,7 @@ if __name__ == '__main__':
             li8xStatus = 1
             args_list['device'] = 820
             args_list['id'] = cnt1 = cnt
-            a = Thread(target=licor, kwargs=args_list)
+            a = Process(target=licor, kwargs=args_list)
             a.start()
             cnt += 1
 
@@ -252,7 +218,7 @@ if __name__ == '__main__':
             args_list['id'] = cnt2 = cnt
             cnt += 1
             
-            b = Thread(target=licor, kwargs=args_list)
+            b = Process(target=licor, kwargs=args_list)
             
             if not li6xStatus:
                 li6xStatus = 1
@@ -260,7 +226,7 @@ if __name__ == '__main__':
                 
             else:
                 li6xStatus = 0
-                b.exit()
+                b.terminate()
             
         elif user_input is '3':
             i2cStatus = 1
