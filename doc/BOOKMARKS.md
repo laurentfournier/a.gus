@@ -34,6 +34,15 @@
 - https://code.google.com/archive/p/gui2py/
 - https://kivy.org/docs/api-kivy.html
 - https://pythonhosted.org/guidata/overview.html 
+- PyGTK
+ - http://www.pygtk.org/dist/pygtk2-tut.pdf
+ - http://notmyname.github.io/pygtkChart/
+- TKInter
+ - http://apprendre-python.com/page-tkinter-interface-graphique-python-tutoriel
+ - http://vincent.developpez.com/cours-tutoriels/python/tkinter/apprendre-creer-interface-graphique-tkinter-python-3/
+ - http://stackoverflow.com/questions/31549613/displaying-a-matplotlib-bar-chart-in-tkinter
+ - http://matplotlib.org/examples/user_interfaces/embedding_in_tk.html
+ - http://www.science.smith.edu/dftwiki/index.php/Color_Charts_for_TKinter
 
 ### mProcessing:
 - https://pymotw.com/2/multiprocessing/
@@ -46,10 +55,6 @@
 - https://docs.python.org/2/library/threading.html
 - https://openclassrooms.com/courses/apprenez-a-programmer-en-python/la-programmation-parallele-avec-threading
 - https://www.tutorialspoint.com/python/python_multithreading.htm
-
-### PyGTK:
-- http://www.pygtk.org/dist/pygtk2-tut.pdf
-- http://notmyname.github.io/pygtkChart/
 
 ### RealTime:
 - http://www.frank-durr.de/?p=203
