@@ -16,6 +16,7 @@ _threading_ is **for a fairly narrow range of applications which are I/O bound**
 _threading_ suffers from **two major disadvantages in Python**. One, of course, is implementation specific --- mostly affecting CPython. That's the GIL (Global Interpreter Lock). For the most part, most CPython programs will not benefit from the availability of more than two CPUs (cores) and often performance will suffer from the GIL locking contention. The larger issue which is not implementation specific, is that threads share the same memory, signal handlers, file descriptors and certain other OS resources. Thus the programmer must be extremely careful about object locking, exception handling and other aspects of their code which are both subtle and which can kill, stall, or deadlock the entire process (suite of threads).
 
 By comparison the _multiprocessing_ model gives each process its own memory, file descriptors, etc. A crash or unhandled exception in any one of them will only kill that resource and robustly handling the disappearance of a child or sibling process can be considerably easier than debugging, isolating and fixing or working around similar issues in threads.
+
 _(Note: use of **threading** with major Python systems, such as Numpy, may suffer considerably less from GIL contention then most of your own Python code would. That's because they've been specifically engineered to do so)._
 
 ## _Multi-threaded program advantages:_
