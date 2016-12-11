@@ -17,7 +17,7 @@ _threading_ suffers from **two major disadvantages in Python**. One, of course, 
 
 By comparison the _multiprocessing_ model gives each process its own memory, file descriptors, etc. A crash or unhandled exception in any one of them will only kill that resource and robustly handling the disappearance of a child or sibling process can be considerably easier than debugging, isolating and fixing or working around similar issues in threads.
 
-_(Note: use of **threading** with major Python systems, such as Numpy, may suffer considerably less from GIL contention then most of your own Python code would. That's because they've been specifically engineered to do so)._
+###### _(Note: use of **threading** with major Python systems, such as Numpy, may suffer considerably less from GIL contention then most of your own Python code would. That's because they've been specifically engineered to do so)._
 
 ## _Multi-threaded program advantages:_
 * Less overhead to establish and terminate vs. a process: because very little memory copying is required (just the thread stack), threads are faster to start than processes. To start a process, the whole process area must be duplicated for the new process copy to start. While some operating systems only copy memory once it is modified (copy-on-write), this is not universally guaranteed.
