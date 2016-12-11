@@ -50,7 +50,14 @@
 - https://github.com/bjornt/pysmbus/blob/master/smbus.py
 - https://github.com/kplindegaard/smbus2
 
-### Threading:
+### mProcessing:
+- https://pymotw.com/2/multiprocessing/
+- http://sametmax.com/remplacer-les-threads-avec-le-module-multiprocessing-en-python/
+- http://stackoverflow.com/questions/10529461/multiprocessing-process-terminate-fails-on-linux
+- http://stackoverflow.com/a/23717074/2885761
+- http://stackoverflow.com/a/1231648/2885761
+
+### mThreading:
 - https://docs.python.org/2/library/threading.html
 - https://openclassrooms.com/courses/apprenez-a-programmer-en-python/la-programmation-parallele-avec-threading
 - https://www.tutorialspoint.com/python/python_multithreading.htm
