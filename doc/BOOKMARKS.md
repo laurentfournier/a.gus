@@ -27,10 +27,17 @@
 - http://blog.appliedinformaticsinc.com/managing-cron-jobs-with-python-crontab/
 - http://gitpython.readthedocs.io/en/stable/tutorial.html#tutorial-label
 
+### GIT:
+- http://rogerdudler.github.io/git-guide/index.fr.html
+
 ### GUI:
 - https://code.google.com/archive/p/gui2py/
 - https://kivy.org/docs/api-kivy.html
 - https://pythonhosted.org/guidata/overview.html 
+
+### PyGTK:
+- http://www.pygtk.org/dist/pygtk2-tut.pdf
+- http://notmyname.github.io/pygtkChart/
 
 ### RealTime:
 - http://www.frank-durr.de/?p=203
