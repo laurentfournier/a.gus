@@ -99,14 +99,16 @@ def licor(**kwargs):
     loops      = kwargs['loops']
     device     = kwargs['device']
     ids        = kwargs['id']
-    
+
+    kwargs['pid'] = os.getpid
+
     try:                                                                                # Connect to device
         global probe
-        
+
         if   device == 820 or device == 840: probe.append(Licor8xx(**kwargs))
         elif device == 6262:                 probe.append(Licor6xx(**kwargs))
         elif device == 7000:                 probe.append(Licor7xx(**kwargs))
-        
+
         probe[ids].connect()
 
     except Exception as e:
@@ -132,7 +134,7 @@ def licor(**kwargs):
     date_time = datetime.datetime.now()
     pathname = '{}licor{}/'.format(LOG_DIR, device)
     filename = '{}licor{}-data-{}.csv'.format(pathname, device, date_time)
-    
+
     if not os.path.isdir(pathname):                                                     # Verify if directory already exists
         os.system('mkdir {}'.format(pathname))
 
@@ -142,14 +144,14 @@ def licor(**kwargs):
             fp.write('\n')
 
             while loops:
-                if (datetime.datetime.now().strftime("%S") == "00"):
+                if (datetime.datetime.now().minute == 00):
                     try:
                         data = probe[ids].read()                                        # Read from device
                         fp.write(';'.join(data))                                        # Write data
                         fp.write('\n')
                         t_buffer[0] = data
-                        
-                        while (datetime.datetime.now().strftime("%S") == "00"):
+
+                        while (datetime.datetime.now().minute == 00):
                             pass
 
                     except Exception as e:
@@ -164,10 +166,10 @@ def licor(**kwargs):
 
     else:                                                                               # If logging is Disabled
         while loops:
-            if (datetime.datetime.now().strftime("%S") == "00"):
+            if (datetime.datetime.now().minute == 00):
                 try:
                     data = probe[ids].read()
-                    while (datetime.datetime.now().strftime("%S") == "00"):
+                    while (datetime.datetime.now().minute == 00):
                         pass
 
                 except Exception as e:
@@ -186,8 +188,10 @@ if __name__ == '__main__':
     while not exitFlag:
         if (li8xStatus == True): print "Li820:  Active" #(("Li820:  {}").format(probe[cnt1].get_data())
         else: print ("Li820:  Inactive")
+
         if (li6xStatus == True): print "Li6262: Active" #(("Li6262: {}").format(probe[cnt2].get_data())
         else: print ("Li6262: Inactive")
+
         if (i2cStatus  == True): print "I2C:    Active" #(("I2C:    {}").format(probe[cnt3].get_data())
         else: print ("I2C:    Inactive")
         print ("_______________________________________________________________\n")
@@ -204,30 +208,27 @@ if __name__ == '__main__':
         os.system('clear')
 
         if   user_input is '0': pass
-        
+
         elif user_input is '1':
-            li8xStatus = 1
             args_list['device'] = 820
             args_list['id'] = cnt1 = cnt
-            a = Process(target=licor, kwargs=args_list)
-            a.start()
             cnt += 1
+
+            a = Process(target=licor, kwargs=args_list)
+
+            if not li8xStatus: li8xStatus = 1; a.start()
+            else:              li8xStatus = 0; os.sytem('kill -9 {}'.format(kwargs['pid8']))
 
         elif user_input is '2':
             args_list['device'] = 6262
             args_list['id'] = cnt2 = cnt
             cnt += 1
-            
+
             b = Process(target=licor, kwargs=args_list)
-            
-            if not li6xStatus:
-                li6xStatus = 1
-                b.start()
-                
-            else:
-                li6xStatus = 0
-                b.terminate()
-            
+
+            if not li6xStatus: li6xStatus = 1; b.start()
+            else:              li6xStatus = 0; os.sytem('kill -9 {}'.format(kwargs['pid6']))
+
         elif user_input is '3':
             i2cStatus = 1
             cnt += 1
@@ -236,7 +237,7 @@ if __name__ == '__main__':
 
         elif user_input is 'q' or 'Q':
             exitFlag = 1
-            
+
         else: pass
 
 #-------------------------------------------------------------
