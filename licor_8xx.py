@@ -67,6 +67,8 @@ class Licor8xx:
         self.device     = kwargs.pop('device',  DEVICE)
         self._header    = kwargs.pop('header',  HEADER)
 
+        kwargs['pid8'] = os.getpid
+
         fp = fm.fManager('config/.cfg', 'r')
         fp.open()
         fp.cfg_loader()
