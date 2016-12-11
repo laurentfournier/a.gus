@@ -1,6 +1,3 @@
-### Cloud:
-- https://pypi.python.org/pypi/micropython-cloudmanager/0.0.93
-
 ### Cookbook:
 - https://wiki.python.org/moin/SimplePrograms
 - http://www.programiz.com/python-programming/examples
@@ -29,6 +26,9 @@
 
 ### GIT:
 - http://rogerdudler.github.io/git-guide/index.fr.html
+- http://www.syntevo.com/smartgit/
+- https://www.linux.com/learn/how-run-your-own-git-server
+- https://about.gitlab.com/
 
 ### GUI:
 - https://code.google.com/archive/p/gui2py/
@@ -59,8 +59,7 @@
 - http://flask.pocoo.org/
 - http://cherrypy.org/
 
-### Server:
-- http://www.syntevo.com/smartgit/
-- https://www.linux.com/learn/how-run-your-own-git-server
-- https://about.gitlab.com/
+### Web:
+- https://pypi.python.org/pypi/micropython-cloudmanager/0.0.93
+- http://twistedmatrix.com/trac/
 
