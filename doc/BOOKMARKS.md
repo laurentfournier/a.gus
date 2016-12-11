@@ -66,6 +66,7 @@
 - http://nullege.com/codes/search/smbus.SMBus
 - https://github.com/bjornt/pysmbus/blob/master/smbus.py
 - https://github.com/kplindegaard/smbus2
+- https://pyserial.readthedocs.io/en/latest/
 
 ### Remote:
 - http://flask.pocoo.org/
