@@ -12,6 +12,7 @@ import serial
 import argparse
 
 from multiprocessing import Process, Queue
+from threading       import Timer
 
 import signal
 signal.signal(signal.SIGINT, signal.default_int_handler)
@@ -60,10 +61,10 @@ CONTINUOUS = args.continuous
 DEBUG      = args.debug
 DEVICE     = args.model
 LOG        = args.logging
-LOOPS      = args.loops                                                                 # Nr of data extractions
+LOOPS      = args.loops             # Nr of data extractions
 
 FREQ    = 5
-PORT    = '/dev/ttyUSB0'
+PORT0   = '/dev/ttyUSB0'
 BAUD    = 9600
 PARITY  = 'N'
 STOPBIT = 1
@@ -71,7 +72,7 @@ BYTE_SZ = 8
 TIMEOUT = 5.0
 LOG_DIR = 'logs/'
 
-args_list  = { 'port' : PORT,    'baud': BAUD,             'timeout': TIMEOUT,
+args_list  = { 'port' : PORT0,   'baud': BAUD,             'timeout': TIMEOUT,
                'config': CONFIG, 'continuous': CONTINUOUS, 'debug': DEBUG,
                'device': DEVICE, 'log': LOG,               'loops': LOOPS }
 
@@ -102,7 +103,8 @@ def licor(**kwargs):
 
     kwargs['pid'] = os.getpid
 
-    try:                                                                                # Connect to device
+    # Connect to device
+    try:
         global probe
 
         if   device == 820 or device == 840: probe.append(Licor8xx(**kwargs))
@@ -118,7 +120,8 @@ def licor(**kwargs):
       ###################
       # Writing routine #
       ###################
-    if config:                                                                          # Configure the device if required
+    # Configure the device if required
+    if config:
         try:
             #probe[cnt].config_R()
             probe[cnt].config_W()
@@ -131,51 +134,65 @@ def licor(**kwargs):
       # Reading routine #
       ###################
     global t_buffer
+
     date_time = datetime.datetime.now()
     pathname = '{}licor{}/'.format(LOG_DIR, device)
     filename = '{}licor{}-data-{}.csv'.format(pathname, device, date_time)
 
-    if not os.path.isdir(pathname):                                                     # Verify if directory already exists
+    # Verify if directory already exists
+    if not os.path.isdir(pathname):
         os.system('mkdir {}'.format(pathname))
 
-    if log:                                                                             # If logging is enabled
+    # If logging is enabled
+    if log:
         with open(filename, 'w') as fp:
-            fp.write(';'.join(probe[ids]._header))                                      # Write headers
+            # Write headers
+            fp.write(';'.join(probe[ids]._header))
             fp.write('\n')
 
             while loops:
                 if (datetime.datetime.now().minute == 00):
                     try:
-                        data = probe[ids].read()                                        # Read from device
-                        fp.write(';'.join(data))                                        # Write data
+                        # Read from device
+                        data = probe[ids].read()
+                        # Write data
+                        fp.write(';'.join(data))
                         fp.write('\n')
                         t_buffer[0] = data
 
+                        # Do only once per minute
                         while (datetime.datetime.now().minute == 00):
                             pass
 
                     except Exception as e:
                         if debug: print ("ERROR: {}".format(e))
 
-                    except KeyboardInterrupt:                                           # CTRL+C catcher - Not working
+                    # CTRL+C catcher - Not working
+                    except KeyboardInterrupt:
                         sys.exit("Program terminated properly")
 
                 if not continuous: loops -= 1
 
             fp.close()
 
-    else:                                                                               # If logging is Disabled
+    # If logging is Disabled
+    else:
         while loops:
             if (datetime.datetime.now().minute == 00):
                 try:
+                    # Read from device
                     data = probe[ids].read()
+                    t_buffer[0] = data
+
+                    # Do only once per minute
                     while (datetime.datetime.now().minute == 00):
                         pass
 
                 except Exception as e:
                     if debug: print ("ERROR: {}".format(e))
 
-                except KeyboardInterrupt:                                               # CTRL+C catcher - Not working
+                # CTRL+C catcher - Not working
+                except KeyboardInterrupt:
                     sys.exit("Program terminated properly")
 
             if not continuous: loops -= 1
