@@ -149,5 +149,35 @@ conductivité
 -----------------------------------------------------------------------------
 -----------------------------------------------------------------------------
 
+Traceback (most recent call last):
+  File "main.py", line 222, in <module>
+Process Process-1:
+Process Process-2:
+    Traceback (most recent call last):
+user_input = raw_input("\t|-----------------|\n"
+Traceback (most recent call last):
+  File "/usr/lib/python2.7/multiprocessing/process.py", line 258, in _bootstrap
+  File "/usr/lib/python2.7/multiprocessing/process.py", line 258, in _bootstrap
+KeyboardInterrupt
+    self.run()
+    self.run()
+  File "/usr/lib/python2.7/multiprocessing/process.py", line 114, in run
+  File "/usr/lib/python2.7/multiprocessing/process.py", line 114, in run
+    self._target(*self._args, **self._kwargs)
+    self._target(*self._args, **self._kwargs)
+  File "main.py", line 156, in licor
+  File "main.py", line 156, in licor
+    data = probe.read()
+    data = probe.read()
+  File "/home/pi/a.gus/licor_8xx.py", line 89, in read
+  File "/home/pi/a.gus/licor_6xx.py", line 79, in read
+    raw = self.con.readline()
+    raw = bs(self.con.readline(), 'lxml')
+  File "/usr/lib/python2.7/dist-packages/serial/serialposix.py", line 446, in read
+  File "/usr/lib/python2.7/dist-packages/serial/serialposix.py", line 446, in read
+    ready,_,_ = select.select([self.fd],[],[], self._timeout)
+    ready,_,_ = select.select([self.fd],[],[], self._timeout)
+KeyboardInterrupt
+KeyboardInterrupt
 
 ```
