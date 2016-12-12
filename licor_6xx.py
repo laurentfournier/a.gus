@@ -28,7 +28,7 @@ import file_manager as fm
   ##################
 
 class Licor6xx:
-    def __init__(self, **kwargs):
+    def __init__(self, pipe, headers, **kwargs):
         self.port       = kwargs['port']
         self.baud       = kwargs['baud']
         self.timeout    = kwargs['timeout']
@@ -40,6 +40,9 @@ class Licor6xx:
         self.device     = kwargs['device']
         
         self.pid = kwargs['pid6'] = os.getpid
+        
+        self.p_in, self.p_out = pipe
+        self.header           = headers
 
         fp = fm.fManager('config/.cfg', 'r')
         fp.open()
@@ -67,8 +70,11 @@ class Licor6xx:
 
     def read(self):
         raw = self.con.readline()
+
         res = [ datetime.datetime.now().strftime('%Y-%m-%d'), datetime.datetime.now().strftime('%H:%M:%S'),
                 raw.split()[0], raw.split()[1], raw.split()[2], raw.split()[3], raw.split()[4] ]
+
+        self.p_out.send(res)
 
         if self.debug:
             print ("\nNew Data Point")

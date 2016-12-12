@@ -29,7 +29,7 @@ import file_manager as fm
   ##################
 
 class Licor8xx:
-    def __init__(self, **kwargs):
+    def __init__(self, pipe, headers, **kwargs):
         self.port       = kwargs['port']
         self.baud       = kwargs['baud']
         self.timeout    = kwargs['timeout']
@@ -41,6 +41,9 @@ class Licor8xx:
         self.device     = kwargs['device']
         
         self.pid = kwargs['pid8'] = os.getpid
+
+        self.p_in, self.p_out = pipe
+        self.header           = headers
 
         fp = fm.fManager('config/.cfg', 'r')
         fp.open()
@@ -82,6 +85,8 @@ class Licor8xx:
             raw = raw.li840.data
             res = [ datetime.datetime.now().strftime('%Y-%m-%d'), datetime.datetime.now().strftime('%H:%M:%S'),
                     raw.celltemp.string, raw.cellpres.string, raw.co2.string, raw.h2o.string, raw.h2odewpoint, ]
+
+        self.p_out.send(res)
 
         if self.debug:
             print ("\nNew Data Point")
