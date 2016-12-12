@@ -91,16 +91,16 @@ i2cValue   = 0
 #-------------------------------------------------------------
 #----------------- Tests for Licor sensors -------------------
 #-------------------------------------------------------------
-def licor(pipe **kwargs):
+def licor(pipe, header, **kwargs):
     config     = kwargs['config']
     continuous = kwargs['continuous']
     debug      = kwargs['debug']
     log        = kwargs['log']
     loops      = kwargs['loops']
     device     = kwargs['device']
-    pid        = kwargs['pid'] = os.getpid
-
-    p_in, p_out, p_header = pipe
+    
+    p_in, p_out = pipe
+    p_header    = header
 
     # Connect to device
     try:
@@ -110,13 +110,17 @@ def licor(pipe **kwargs):
 
         if   device == 820 or device == 840: probe = Licor8xx((p_in, p_out), p_header, **kwargs)
         elif device == 6262:                 probe = Licor6xx((p_in, p_out), p_header, **kwargs)
-        #elif device == 7000:                 probe = Licor7xx((p_in, p_out), p_header, **kwargs)
+        elif device == 7000:                 probe = Licor7xx((p_in, p_out), p_header, **kwargs)
 
         probe.connect()
 
     except Exception as e:
         if debug: print ("ERROR: {}".format(e))
         sys.exit("Could not connect to the device")
+
+    except KeyboardInterrupt:
+        probe.disconnect()
+        sys.exit("Program terminated properly")
 
       ###################
       # Writing routine #
@@ -129,7 +133,6 @@ def licor(pipe **kwargs):
 
         except Exception as e:
             if debug: print ("ERROR: {}".format(e))
-            sys.exit("Could not connect to the device")
 
       ###################
       # Reading routine #
@@ -168,8 +171,9 @@ def licor(pipe **kwargs):
                 except Exception as e:
                     if debug: print ("ERROR: {}".format(e))
 
-                # CTRL+C catcher - Not working
+                # CTRL+C catcher - Not working?
                 except KeyboardInterrupt:
+                    probe.disconnect()
                     sys.exit("Program terminated properly")
 
                 if not continuous: loops -= 1
@@ -192,8 +196,9 @@ def licor(pipe **kwargs):
                 except Exception as e:
                     if debug: print ("ERROR: {}".format(e))
 
-                # CTRL+C catcher - Not working
+                # CTRL+C catcher - Not working?
                 except KeyboardInterrupt:
+                    probe.disconnect()
                     sys.exit("Program terminated properly")
 
             if not continuous: loops -= 1
@@ -228,7 +233,7 @@ if __name__ == '__main__':
         if   user_input is '0': pass
 
         elif user_input is '1':
-            args_list['port'] = PORT1
+            args_list['port'] = PORT0
             args_list['device'] = 820
             t_id += 1
             t_id0 = t_id
@@ -236,10 +241,10 @@ if __name__ == '__main__':
             a = Process(target=licor, args=((p_in8, p_out8), p_header8), kwargs=args_list)
 
             if not li8xStatus: li8xStatus = 1; a.start()
-        else:              li8xStatus = 0; os.sytem('kill -9 {}'.format(a.pid))
+            else:              li8xStatus = 0; os.sytem('kill -9 {}'.format(a.pid))
 
         elif user_input is '2':
-            args_list['port'] = PORT0
+            args_list['port'] = PORT1
             args_list['device'] = 6262
             t_id += 1
             t_id1 = t_id
@@ -247,7 +252,7 @@ if __name__ == '__main__':
             b = Process(target=licor, args=((p_in6, p_out6), p_header6), kwargs=args_list)
 
             if not li6xStatus: li6xStatus = 1; b.start()
-        else:              li6xStatus = 0; os.sytem('kill -9 {}'.format(b.pid))
+            else:              li6xStatus = 0; os.sytem('kill -9 {}'.format(b.pid))
 
         elif user_input is '3':
             i2cStatus = 1
