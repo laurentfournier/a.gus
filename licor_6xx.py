@@ -20,32 +20,6 @@ from lxml import etree
 import file_manager as fm
 
 #-------------------------------------------------------------
-#------------------ Open configurations ----------------------
-#-------------------------------------------------------------
-
-  ############
-  # Settings #
-  ############
-
-CONFIG     = False
-CONTINUOUS = True
-DEBUG      = True
-LOG        = True
-LOOPS      = 5                                                                          # Nr of data extractions
-DEVICE     = 820                                                                        # List of devices's models
-
-FREQ       = 60
-PORT       = '/dev/ttyUSB0'
-BAUD       = 9600
-PARITY     = 'N'
-STOPBIT    = 1
-BYTE_SZ    = 8
-TIMEOUT    = 5.0
-LOG_DIR    = 'logs/'
-HEADER     = []
-
-
-#-------------------------------------------------------------
 #----- Better know what you are doing from this point --------
 #-------------------------------------------------------------
 
@@ -55,18 +29,17 @@ HEADER     = []
 
 class Licor6xx:
     def __init__(self, **kwargs):
-        self.port       = kwargs.pop('port',    PORT)
-        self.baud       = kwargs.pop('baud',    BAUD)
-        self.timeout    = kwargs.pop('timeout', TIMEOUT)
-        self.config     = kwargs.pop('config',  CONFIG)
-        self.continuous = kwargs.pop('continuous', CONTINUOUS)
-        self.debug      = kwargs.pop('debug',   DEBUG)
-        self.log        = kwargs.pop('log',     LOG)
-        self.loops      = kwargs.pop('loops',   LOOPS)
-        self.device     = kwargs.pop('device',  DEVICE)
-        self._header    = kwargs.pop('header',  HEADER)
-
-        kwargs['pid6'] = os.getpid
+        self.port       = kwargs['port']
+        self.baud       = kwargs['baud']
+        self.timeout    = kwargs['timeout']
+        self.config     = kwargs['config']
+        self.continuous = kwargs['continuous']
+        self.debug      = kwargs['debug']
+        self.log        = kwargs['log']
+        self.loops      = kwargs['loops']
+        self.device     = kwargs['device']
+        
+        self.pid = kwargs['pid6'] = os.getpid
 
         fp = fm.fManager('config/.cfg', 'r')
         fp.open()
@@ -97,13 +70,12 @@ class Licor6xx:
         res = [ datetime.datetime.now().strftime('%Y-%m-%d'), datetime.datetime.now().strftime('%H:%M:%S'),
                 raw.split()[0], raw.split()[1], raw.split()[2], raw.split()[3], raw.split()[4] ]
 
-        self.res = res
-
         if self.debug:
             print ("\nNew Data Point")
             for each in zip(self._header, res):
                 print (each[0], each[1])
-
+                
+        self.res = res
         return res
 
     def config_W(self):                                                                 # Write a complete instruction row
