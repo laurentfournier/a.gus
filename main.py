@@ -7,8 +7,7 @@
 '''
 
 import os, sys, subprocess
-import time, datetime
-import serial
+import datetime
 import argparse
 
 from multiprocessing import Process, Queue, Pipe
@@ -17,23 +16,10 @@ from threading       import Timer
 import signal
 signal.signal(signal.SIGINT, signal.default_int_handler)
 
-from bs4         import BeautifulSoup as bs
-from lxml        import etree
-from collections import Counter
-
 # External libraries
-import file_manager as fm
 from licor_6xx import Licor6xx
 from licor_7xx import Licor7xx
 from licor_8xx import Licor8xx
-'''
-# GUI
-from kivy.app import App
-from kivy.clock import Clock
-from kivy.config import Config
-Config.set('kivy', 'keyboard_mode', 'systemandmulti')
-from kivy.uix.button import Button
-from kivy.uix.widget import Widget'''
 
 #-------------------------------------------------------------
 #------------------ Open configurations ----------------------
@@ -67,6 +53,11 @@ FREQ    = 5
 PORT0   = '/dev/ttyUSB0'
 PORT1   = '/dev/ttyUSB1'
 PORT2   = '/dev/ttyUSB2'
+PORT3   = '/dev/ttyUSB3'
+PORT4   = '/dev/ttyUSB4'
+PORT5   = '/dev/ttyUSB5'
+PORT6   = '/dev/ttyUSB6'
+PORT7   = '/dev/ttyUSB7'
 BAUD    = 9600
 PARITY  = 'N'
 STOPBIT = 1
@@ -100,28 +91,26 @@ i2cValue   = 0
 #-------------------------------------------------------------
 #----------------- Tests for Licor sensors -------------------
 #-------------------------------------------------------------
-def licor(ident, pipe, headers, **kwargs):
+def licor(pipe **kwargs):
     config     = kwargs['config']
     continuous = kwargs['continuous']
     debug      = kwargs['debug']
     log        = kwargs['log']
     loops      = kwargs['loops']
     device     = kwargs['device']
-    
-    pid = kwargs['pid'] = os.getpid
-    
-    p_in6, p_in8, p_out6, p_out8 = pipe
-    p_header6, p_header8         = headers
-    
+    pid        = kwargs['pid'] = os.getpid
+
+    p_in, p_out, p_header = pipe
+
     # Connect to device
     try:
         global probe
         global t_buffer
         global t_id
 
-        if   device == 820 or device == 840: probe = Licor8xx((p_in8, p_out8), p_header8, **kwargs)
-        elif device == 6262:                 probe = Licor6xx((p_in6, p_out6), p_header6, **kwargs)
-        #elif device == 7000:                 probe = Licor7xx((p_in7, p_out7), **kwargs)
+        if   device == 820 or device == 840: probe = Licor8xx((p_in, p_out), p_header, **kwargs)
+        elif device == 6262:                 probe = Licor6xx((p_in, p_out), p_header, **kwargs)
+        #elif device == 7000:                 probe = Licor7xx((p_in, p_out), p_header, **kwargs)
 
         probe.connect()
 
@@ -167,7 +156,7 @@ def licor(ident, pipe, headers, **kwargs):
                     # Read from device
                     buff = data = probe.read()
                     p_out.send(buff)
-                    
+
                     # Write data
                     fp.write(';'.join(data))
                     fp.write('\n')
@@ -244,10 +233,10 @@ if __name__ == '__main__':
             t_id += 1
             t_id0 = t_id
 
-            a = Process(target=licor, args=(str(t_id0), (p_in6, p_in8, p_out6, p_out8), (p_header6, p_header8)), kwargs=args_list)
-            
+            a = Process(target=licor, args=((p_in8, p_out8), p_header8), kwargs=args_list)
+
             if not li8xStatus: li8xStatus = 1; a.start()
-            else:              li8xStatus = 0; os.sytem('kill -9 {}'.format(kwargs['pid8']))
+        else:              li8xStatus = 0; os.sytem('kill -9 {}'.format(a.pid))
 
         elif user_input is '2':
             args_list['port'] = PORT0
@@ -255,10 +244,10 @@ if __name__ == '__main__':
             t_id += 1
             t_id1 = t_id
 
-            b = Process(target=licor, args=(str(t_id1), (p_in6, p_in8, p_out6, p_out8), (p_header6, p_header8)), kwargs=args_list)
-            
+            b = Process(target=licor, args=((p_in6, p_out6), p_header6), kwargs=args_list)
+
             if not li6xStatus: li6xStatus = 1; b.start()
-            else:              li6xStatus = 0; os.sytem('kill -9 {}'.format(kwargs['pid6']))
+        else:              li6xStatus = 0; os.sytem('kill -9 {}'.format(b.pid))
 
         elif user_input is '3':
             i2cStatus = 1
@@ -270,35 +259,3 @@ if __name__ == '__main__':
             exitFlag = 1
 
         else: pass
-
-#-------------------------------------------------------------
-#-------------------------- Sample ---------------------------
-#-------------------------------------------------------------
-'''# Create new threads
-for tName in threadList:
-    thread = myThread(threadID, tName, workQueue, **args_list)
-    thread.start()
-    threads.append(thread)
-    threadID += 1
-
-# Fill the queue
-queueLock.acquire()
-
-for word in nameList:
-    workQueue.put(word)
-
-queueLock.release()
-
-# Wait for queue to empty
-while not workQueue.empty():
-    pass
-
-# Notify threads it's time to exit
-exitFlag = 1
-
-# Wait for all threads to complete
-for t in threads:
-    t.join()
-
-print "Exiting Main Thread"
-'''
