@@ -17,9 +17,7 @@ import signal
 signal.signal(signal.SIGINT, signal.default_int_handler)
 
 # External libraries
-from licor_6xx import Licor6xx
-from licor_7xx import Licor7xx
-from licor_8xx import Licor8xx
+import log_manager as lm
 
 #-------------------------------------------------------------
 #------------------ Open configurations ----------------------
@@ -69,139 +67,17 @@ args_list  = { 'port' : PORT0,   'baud': BAUD,             'timeout': TIMEOUT,
                'config': CONFIG, 'continuous': CONTINUOUS, 'debug': DEBUG,
                'device': DEVICE, 'log': LOG,               'loops': LOOPS }
 
-#q_in, q_out = Queue()
-p_in6, p_out6        = Pipe()
-p_in8, p_out8        = Pipe()
-p_header6, p_header8 = Pipe()
+q_in, q_out = Queue()
 
 data     = 0.0
 cnt      = 0
 exitFlag = 0
 
 probe      = []
-t_buffer   = {}
 t_id       = -1
 li8xStatus = 0
-li8xValue  = 0
 li6xStatus = 0
-li6xValue  = 0
 i2cStatus  = 0
-i2cValue   = 0
-
-#-------------------------------------------------------------
-#----------------- Tests for Licor sensors -------------------
-#-------------------------------------------------------------
-def licor(pipe, header, **kwargs):
-    config     = kwargs['config']
-    continuous = kwargs['continuous']
-    debug      = kwargs['debug']
-    log        = kwargs['log']
-    loops      = kwargs['loops']
-    device     = kwargs['device']
-    
-    p_in, p_out = pipe
-    p_header    = header
-
-    # Connect to device
-    try:
-        global probe
-        global t_buffer
-        global t_id
-
-        if   device == 820 or device == 840: probe = Licor8xx((p_in, p_out), p_header, **kwargs)
-        elif device == 6262:                 probe = Licor6xx((p_in, p_out), p_header, **kwargs)
-        elif device == 7000:                 probe = Licor7xx((p_in, p_out), p_header, **kwargs)
-
-        probe.connect()
-
-    except Exception as e:
-        if debug: print ("ERROR: {}".format(e))
-        sys.exit("Could not connect to the device")
-
-    except KeyboardInterrupt:
-        probe.disconnect()
-        sys.exit("Program terminated properly")
-
-      ###################
-      # Writing routine #
-      ###################
-    # Configure the device if required
-    if config:
-        try:
-            #probe.config_R()
-            probe.config_W()
-
-        except Exception as e:
-            if debug: print ("ERROR: {}".format(e))
-
-      ###################
-      # Reading routine #
-      ###################
-    date_time = datetime.datetime.now()
-    pathname = '{}licor{}/'.format(LOG_DIR, device)
-    filename = '{}licor{}-data-{}.csv'.format(pathname, device, date_time)
-
-    # Verify if directory already exists
-    if not os.path.isdir(pathname):
-        os.system('mkdir {}'.format(pathname))
-
-    # If logging is enabled
-    if log:
-        with open(filename, 'w') as fp:
-            # Write headers
-            fp.write(';'.join(probe._header))
-            fp.write('\n')
-
-            while loops:
-                data = probe.read()
-                #if (datetime.datetime.now().strftime("%S") == "00"):
-                try:
-                    # Read from device
-                    buff = data = probe.read()
-                    p_out.send(buff)
-
-                    # Write data
-                    fp.write(';'.join(data))
-                    fp.write('\n')
-
-                    # Do only once per minute
-                    #while (datetime.datetime.now().strftime("%S") == "00"):
-                    #    pass
-
-                except Exception as e:
-                    if debug: print ("ERROR: {}".format(e))
-
-                # CTRL+C catcher - Not working?
-                except KeyboardInterrupt:
-                    probe.disconnect()
-                    sys.exit("Program terminated properly")
-
-                if not continuous: loops -= 1
-
-            fp.close()
-
-    # If logging is Disabled
-    else:
-        while loops:
-            if (datetime.datetime.now().strftime("%S") == "00"):
-                try:
-                    # Read from device
-                    data = probe.read()
-                    p_out.send(data)
-
-                    # Do only once per minute
-                    while (datetime.datetime.now().strftime("%S") == "00"):
-                        pass
-
-                except Exception as e:
-                    if debug: print ("ERROR: {}".format(e))
-
-                # CTRL+C catcher - Not working?
-                except KeyboardInterrupt:
-                    probe.disconnect()
-                    sys.exit("Program terminated properly")
-
-            if not continuous: loops -= 1
 
 #-------------------------------------------------------------
 #----------------------- Main program ------------------------
@@ -209,14 +85,15 @@ def licor(pipe, header, **kwargs):
 if __name__ == '__main__':
     os.system('clear')
     while not exitFlag:
-        if (li8xStatus == True): print ("Li820:  {}").format(p_in8.recv())
-        else: print ("Li820:  Inactive")
+        if (li8xStatus == True): print ("Li820:  Active")
+        else:                    print ("Li820:  Inactive")
 
-        if (li6xStatus == True): print ("Li6262: {}").format(p_in6.recv())
-        else: print ("Li6262: Inactive")
+        if (li6xStatus == True): print ("Li6262: Active")
+        else:                    print ("Li6262: Inactive")
 
-        if (i2cStatus  == True): print "I2C:    Active" #(("I2C:    {}").format(probe.get_data())
-        else: print ("I2C:    Inactive")
+        if (i2cStatus  == True): print ("I2C:    Active")
+        else:                    print ("I2C:    Inactive")
+        
         print ("_______________________________________________________________\n")
 
         user_input = raw_input("\t|-----------------|\n"
@@ -238,10 +115,10 @@ if __name__ == '__main__':
             t_id += 1
             t_id0 = t_id
 
-            a = Process(target=licor, args=((p_in8, p_out8), p_header8), kwargs=args_list)
-
-            if not li8xStatus: li8xStatus = 1; a.start()
-            else:              li8xStatus = 0; os.sytem('kill -9 {}'.format(a.pid))
+            Li820 = lm.logManager(queue=(q_in, q_out), kwargs=(args_list))
+            
+            if not li8xStatus: li8xStatus = 1; Li820.start()
+            else:              li8xStatus = 0; Li820.stop()
 
         elif user_input is '2':
             args_list['port'] = PORT1
@@ -249,16 +126,16 @@ if __name__ == '__main__':
             t_id += 1
             t_id1 = t_id
 
-            b = Process(target=licor, args=((p_in6, p_out6), p_header6), kwargs=args_list)
-
-            if not li6xStatus: li6xStatus = 1; b.start()
-            else:              li6xStatus = 0; os.sytem('kill -9 {}'.format(b.pid))
+            Li6262 = lm.logManager(queue=(q_in, q_out), kwargs=(args_list))
+            
+            if not li6xStatus: li6xStatus = 1; Li6262.start()
+            else:              li6xStatus = 0; Li6262.stop()
 
         elif user_input is '3':
-            i2cStatus = 1
-            cnt += 1
-            args_list['id'] = cnt3 = cnt
-            todo
+            args_list['port'] = I2C0
+            args_list['device'] = I2C
+            t_id += 1
+            t_id2 = t_id
 
         elif user_input is 'q' or 'Q':
             exitFlag = 1
