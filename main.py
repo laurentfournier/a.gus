@@ -30,9 +30,9 @@ import log_manager as lm
 parser = argparse.ArgumentParser(description = '')
 parser.add_argument('-c', '--continuous', type=bool, help='No outputs limitation', default=True,  choices=[True, False])
 parser.add_argument('-C', '--config',     type=bool, help='Configuration mode',    default=False, choices=[True, False])
-parser.add_argument('-d', '--debug',      type=bool, help='Debugging mode',        default=False, choices=[True, False])
+parser.add_argument('-d', '--debug',      type=bool, help='Debugging mode',        default=True, choices=[True, False])
 parser.add_argument('-l', '--loops',      type=int,  help='Number of outputs',     default=5)
-parser.add_argument('-L', '--logging',    type=bool, help='Storing in .CSV files', default=True,  choices=[True, False])
+parser.add_argument('-L', '--logging',    type=bool, help='Storing in .CSV files', default=False, choices=[True, False])
 parser.add_argument('-m', '--model',      type=int,  help='Select device model',   default=6262,  choices=[820, 840, 6262, 7000])
 args = parser.parse_args()
 
@@ -61,20 +61,20 @@ PARITY  = 'N'
 STOPBIT = 1
 BYTE_SZ = 8
 TIMEOUT = 5.0
-LOG_DIR = 'logs/'
 
 args_list  = { 'port' : PORT0,   'baud': BAUD,             'timeout': TIMEOUT,
                'config': CONFIG, 'continuous': CONTINUOUS, 'debug': DEBUG,
                'device': DEVICE, 'log': LOG,               'loops': LOOPS }
 
-q_in, q_out = Queue()
+q_in  = Queue()
+q_out = Queue()
 
-data     = 0.0
-cnt      = 0
+#data     = 0.0
+#cnt      = 0
 exitFlag = 0
 
-probe      = []
-t_id       = -1
+#probe      = []
+o_id       = -1
 li8xStatus = 0
 li6xStatus = 0
 i2cStatus  = 0
@@ -85,13 +85,13 @@ i2cStatus  = 0
 if __name__ == '__main__':
     os.system('clear')
     while not exitFlag:
-        if (li8xStatus == True): print ("Li820:  Active")
+        if (li8xStatus is True): print ("Li820:  Active")
         else:                    print ("Li820:  Inactive")
 
-        if (li6xStatus == True): print ("Li6262: Active")
+        if (li6xStatus is True): print ("Li6262: Active")
         else:                    print ("Li6262: Inactive")
 
-        if (i2cStatus  == True): print ("I2C:    Active")
+        if (i2cStatus  is True): print ("I2C:    Active")
         else:                    print ("I2C:    Inactive")
         
         print ("_______________________________________________________________\n")
@@ -112,32 +112,35 @@ if __name__ == '__main__':
         elif user_input is '1':
             args_list['port'] = PORT0
             args_list['device'] = 820
-            t_id += 1
-            t_id0 = t_id
+            o_id += 1
+            o_id0 = o_id
 
             Li820 = lm.logManager(queue=(q_in, q_out), kwargs=(args_list))
             
-            if not li8xStatus: li8xStatus = 1; Li820.start()
+            if not li8xStatus: li8xStatus = 1; Li820.start(); Li820.read(mode='logger')
             else:              li8xStatus = 0; Li820.stop()
 
         elif user_input is '2':
             args_list['port'] = PORT1
             args_list['device'] = 6262
-            t_id += 1
-            t_id1 = t_id
+            o_id += 1
+            o_id1 = o_id
 
             Li6262 = lm.logManager(queue=(q_in, q_out), kwargs=(args_list))
-            
-            if not li6xStatus: li6xStatus = 1; Li6262.start()
+
+            if not li6xStatus: li6xStatus = 1; Li6262.start(); Li6262.read(mode='logger')
             else:              li6xStatus = 0; Li6262.stop()
 
         elif user_input is '3':
             args_list['port'] = I2C0
             args_list['device'] = I2C
-            t_id += 1
-            t_id2 = t_id
+            o_id += 1
+            o_id2 = o_id
 
         elif user_input is 'q' or 'Q':
+            if (li8xStatus): Li820.stop()
+            if (li6xStatus): Li6262.stop()
             exitFlag = 1
 
         else: pass
+

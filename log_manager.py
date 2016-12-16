@@ -22,6 +22,17 @@ from licor_7xx import Licor7xx
 from licor_8xx import Licor8xx
 
 #-------------------------------------------------------------
+#------------------ Open configurations ----------------------
+#-------------------------------------------------------------
+
+  ############
+  # Settings #
+  ############
+
+LOG_DIR = 'logs/'
+
+
+#-------------------------------------------------------------
 #----- Better know what you are doing from this point --------
 #-------------------------------------------------------------
 
@@ -29,40 +40,47 @@ from licor_8xx import Licor8xx
   # Initialisation #
   ##################
 
-def logManager:
-    def __init__(self, queue, **kwargs):
+class logManager:
+    def __init__(self, queue, kwargs):
         self.config     = kwargs['config']
         self.continuous = kwargs['continuous']
         self.debug      = kwargs['debug']
+        self.device     = kwargs['device']
         self.log        = kwargs['log']
         self.loops      = kwargs['loops']
         self.device     = kwargs['device']
-        #self.probe      = []
+        self.kwargs     = kwargs
         
         self.q_in, self.q_out = queue
+        self.q_header = Queue()
 
+    # Connect to device
     def start(self):
-        # Connect to device
         try:
-            global probe
-
-            if   (self.device == 820 or self.device == 840): self.probe = Licor8xx((q_in, q_out), q_header, **kwargs)
-            elif (self.device == 6262):                      self.probe = Licor6xx((q_in, q_out), q_header, **kwargs)
-            elif (self.device == 7000):                      self.probe = Licor7xx((q_in, q_out), q_header, **kwargs)
+            if   (self.device == 820 or self.device == 840): self.probe = Process(target=Licor8xx,
+                                                                                  args=((self.q_in, self.q_out), self.q_header),
+                                                                                  kwargs=self.kwargs)
+            
+            elif (self.device == 6262):                      self.probe = Process(target=Licor6xx,
+                                                                                  args=((self.q_in, self.q_out), self.q_header),
+                                                                                  kwargs=self.kwargs)
+            
+            elif (self.device == 7000):                      self.probe = Process(target=Licor7xx,
+                                                                                  args=((self.q_in, self.q_out), self.q_header),
+                                                                                  kwargs=self.kwargs)
 
             self.probe.connect()
 
         except Exception as e:
-            if (self.debug):
-                print ("ERROR: {}".format(e))
-                
+            if (self.debug): print ("ERROR: {}".format(e))
             sys.exit("Could not connect to the device")
 
+    # Disconnect to device
     def stop(self):
         self.probe.disconnect()
-
+        
+    # Configure the device
     def write(self, mode):
-        # Configure the device if required
         if (self.config):
             try:
                 if (mode is 'r'): self.probe.config_R()
@@ -72,17 +90,18 @@ def logManager:
                 if (self.debug):
                     print ("ERROR: {}".format(e))
 
+    # Read data (w/ or w/out logging)
     def read(self, mode):
         date_time = datetime.datetime.now()
-        pathname = '{}licor{}/'.format(LOG_DIR, device)
-        filename = '{}licor{}-data-{}.csv'.format(pathname, device, date_time)
+        pathname = '{}licor{}/'.format(LOG_DIR, self.device)
+        filename = '{}licor{}-data-{}.csv'.format(pathname, self.device, date_time)
 
         # Verify if directory already exists
         if not (os.path.isdir(pathname)):
             os.system('mkdir {}'.format(pathname))
 
         # If logging is enabled
-        if (self.log):
+        if (mode is 'logger'):
             with open(filename, 'w') as fp:
                 # Write headers
                 fp.write(';'.join(self.probe._header))
@@ -105,8 +124,7 @@ def logManager:
                                 pass
 
                         except Exception as e:
-                            if (self.debug):
-                                print ("ERROR: {}".format(e))
+                            if (self.debug): print ("ERROR: {}".format(e))
 
                     if not (self.continuous): self.loops -= 1
 
@@ -126,7 +144,6 @@ def logManager:
                             pass
 
                     except Exception as e:
-                        if (self.debug):
-                            print ("ERROR: {}".format(e))
+                        if (self.debug): print ("ERROR: {}".format(e))
 
                 if not (self.continuous): self.loops -= 1

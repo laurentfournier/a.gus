@@ -23,8 +23,8 @@ import file_manager as fm
   # Initialisation #
   ##################
 
-class Licor6xx(Process):
-    def __init__(self, pipe, header, **kwargs):
+class Licor6xx:
+    def __init__(self, queue, header, kwargs):
         self.port       = kwargs['port']
         self.baud       = kwargs['baud']
         self.timeout    = kwargs['timeout']
@@ -35,7 +35,7 @@ class Licor6xx(Process):
         self.loops      = kwargs['loops']
         self.device     = kwargs['device']
 
-        self.p_in, self.p_out = pipe
+        self.q_in, self.q_out = queue
         self.header = header
 
         fp = fm.fManager('config/.cfg', 'r')
@@ -47,7 +47,7 @@ class Licor6xx(Process):
         # Read from the device
         else:             self._header = [ line.strip() for line in fp.get_cfg('li6262read') ]
 
-        self.header.send(self._header)
+        self.header.put(self._header)
         fp.close()
 
     def connect(self):
@@ -77,11 +77,12 @@ class Licor6xx(Process):
 
     def read(self):
         raw = self.con.readline()
+
         res = [ datetime.datetime.now().strftime('%Y-%m-%d'), datetime.datetime.now().strftime('%H:%M:%S'),
                 raw.split()[0], raw.split()[1], raw.split()[2], raw.split()[3], raw.split()[4] ]
 
         self.res = res
-        self.p_out.send(res)
+        self.q_out.put(res)
 
         if self.debug:
             print ("\nNew Data Point")
