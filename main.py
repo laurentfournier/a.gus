@@ -120,15 +120,15 @@ if __name__ == '__main__':
             Li820 = lm.logManager(queue=(q_in, q_out), kwargs=(args_list))
 
             if not li8xStatus:
-                li8xStatus = 1;
+                li8xStatus = True;
                 Li820.start();
-                #Li820.read(mode='logger')
                 t_Li820 = Thread(target=Li820.read, name='Licor8xx', kwargs={'mode':'logger'})
                 t_Li820.start()
 
             else:
-                li8xStatus = 0;
-                #Li820.stop()
+                li8xStatus = False;
+                t_Li820.terminate()
+                Li820.stop()
 
         elif user_input is '2':
             args_list['port'] = PORT1
@@ -139,15 +139,15 @@ if __name__ == '__main__':
             Li6262 = lm.logManager(queue=(q_in, q_out), kwargs=(args_list))
 
             if not li6xStatus:
-                li6xStatus = 1;
+                li6xStatus = True;
                 Li6262.start();
-                #Li6262.read(mode='logger')
                 t_Li6262 = Thread(target=Li6262.read, name='Licor6xx', kwargs={'mode':'logger'})
                 t_Li6262.start()
 
             else:
-                li6xStatus = 0;
-                #Li6262.stop()
+                li6xStatus = False;
+                t_Li6262.terminate()
+                Li6262.stop()
 
         elif user_input is '3':
             args_list['port'] = I2C0
@@ -156,8 +156,8 @@ if __name__ == '__main__':
             o_id2 = o_id
 
         elif user_input is 'q' or 'Q':
-#            if (li8xStatus): Li820.stop()
-#            if (li6xStatus): Li6262.stop()
+            if (li8xStatus): Li820.stop()
+            if (li6xStatus): Li6262.stop()
             exitFlag = 1
 
         else: pass

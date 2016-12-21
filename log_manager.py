@@ -84,13 +84,14 @@ class logManager:
 
     # Read data (w/ or w/out logging)
     def read(self, mode):
-        date_time = datetime.datetime.now()
-        pathname = '{}licor{}/'.format(LOG_DIR, self.device)
-        filename = '{}licor{}-data-{}.csv'.format(pathname, self.device, date_time)
+        date_time  = datetime.datetime.now()
+        self.path  = '{}licor{}/'.format(LOG_DIR, self.device)
+        self.fname = 'licor{}-data-{}.csv'.format(self.device, date_time)
+        filename   = '{}licor{}-data-{}.csv'.format(self.path, self.device, date_time)
 
         # Verify if directory already exists
-        if not (os.path.isdir(pathname)):
-            os.system('mkdir {}'.format(pathname))
+        if not (os.path.isdir(self.path)):
+            os.system('mkdir {}'.format(self.path))
 
         # If logging is enabled
         if (mode is 'logger'):
@@ -101,22 +102,22 @@ class logManager:
 
                 while (self.loops):
                     data = self.probe.read()
-                    if (datetime.datetime.now().strftime("%S") == "00"):
-                        try:
-                            # Read from device
-                            buff = data = self.probe.read()
-                            q_out.put(buff)
+#                    if (datetime.datetime.now().strftime("%S") == "00"):
+                    try:
+                        # Read from device
+                        buff = data = self.probe.read()
+                        self.q_out.put(buff)
 
-                            # Write data
-                            fp.write(';'.join(data))
-                            fp.write('\n')
+                        # Write data
+                        fp.write(';'.join(data))
+                        fp.write('\n')
 
-                            # Do only once per minute
-                            while (datetime.datetime.now().strftime("%S") == "00"):
-                                pass
+                        # Do only once per minute
+#                            while (datetime.datetime.now().strftime("%S") == "00"):
+#                                pass
 
-                        except Exception as e:
-                            if (self.debug): print ("ERROR: {}".format(e))
+                    except Exception as e:
+                        if (self.debug): print ("ERROR: {}".format(e))
 
                     if not (self.continuous): self.loops -= 1
 
@@ -129,7 +130,7 @@ class logManager:
                     try:
                         # Read from device
                         data = self.probe.read()
-                        q_out.put(data)
+                        self.q_out.put(data)
 
                         # Do only once per minute
                         while (datetime.datetime.now().strftime("%S") == "00"):
