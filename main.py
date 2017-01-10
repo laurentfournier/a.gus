@@ -93,7 +93,7 @@ if __name__ == '__main__':
 
         if (i2cStatus  is True): print ("I2C:    Active")
         else:                    print ("I2C:    Inactive")
-        
+
         print ("_______________________________________________________________\n")
 
         user_input = raw_input("\t|-----------------|\n"
@@ -116,7 +116,7 @@ if __name__ == '__main__':
             o_id0 = o_id
 
             Li820 = lm.logManager(queue=(q_in, q_out), kwargs=(args_list))
-            
+
             if not li8xStatus: li8xStatus = 1; Li820.start(); Li820.read(mode='logger')
             else:              li8xStatus = 0; Li820.stop()
 
@@ -143,4 +143,3 @@ if __name__ == '__main__':
             exitFlag = 1
 
         else: pass
-

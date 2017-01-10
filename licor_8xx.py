@@ -28,7 +28,7 @@ import file_manager as fm
   ##################
 
 class Licor8xx(Process):
-    def __init__(self, pipe, header, **kwargs):
+    def __init__(self, pipe, header, kwargs):
         self.port       = kwargs['port']
         self.baud       = kwargs['baud']
         self.timeout    = kwargs['timeout']
@@ -56,7 +56,7 @@ class Licor8xx(Process):
             elif (self.device == 840):  self._header = [ line.strip() for line in fp.get_cfg('li840read') ]
             else: print ("Wrong device's Model")
 
-        self.header.send(self._header)
+        self.header.put(self._header)
         fp.close()
 
     def connect(self):
@@ -98,7 +98,7 @@ class Licor8xx(Process):
                     raw.celltemp.string, raw.cellpres.string, raw.co2.string, raw.h2o.string, raw.h2odewpoint, ]
 
         self.res = res
-        self.p_out.send(res)
+        self.p_out.put(res)
 
         if self.debug:
             print ("\nNew Data Point")

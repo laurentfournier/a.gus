@@ -57,17 +57,9 @@ class logManager:
     # Connect to device
     def start(self):
         try:
-            if   (self.device == 820 or self.device == 840): self.probe = Process(target=Licor8xx,
-                                                                                  args=((self.q_in, self.q_out), self.q_header),
-                                                                                  kwargs=self.kwargs)
-            
-            elif (self.device == 6262):                      self.probe = Process(target=Licor6xx,
-                                                                                  args=((self.q_in, self.q_out), self.q_header),
-                                                                                  kwargs=self.kwargs)
-            
-            elif (self.device == 7000):                      self.probe = Process(target=Licor7xx,
-                                                                                  args=((self.q_in, self.q_out), self.q_header),
-                                                                                  kwargs=self.kwargs)
+            if   (self.device == 820 or self.device == 840): self.probe = Licor8xx((self.q_in, self.q_out), self.q_header, self.kwargs)            
+            elif (self.device == 6262):                      self.probe = Licor6xx((self.q_in, self.q_out), self.q_header, self.kwargs)            
+            elif (self.device == 7000):                      self.probe = Licor7xx((self.q_in, self.q_out), self.q_header, self.kwargs)
 
             self.probe.connect()
 
