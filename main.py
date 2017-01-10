@@ -11,7 +11,7 @@ import datetime
 import argparse
 
 from multiprocessing import Process, Queue, Pipe
-from threading       import Timer
+from threading       import Timer, Thread
 
 import signal
 signal.signal(signal.SIGINT, signal.default_int_handler)
@@ -30,7 +30,7 @@ import log_manager as lm
 parser = argparse.ArgumentParser(description = '')
 parser.add_argument('-c', '--continuous', type=bool, help='No outputs limitation', default=True,  choices=[True, False])
 parser.add_argument('-C', '--config',     type=bool, help='Configuration mode',    default=False, choices=[True, False])
-parser.add_argument('-d', '--debug',      type=bool, help='Debugging mode',        default=True, choices=[True, False])
+parser.add_argument('-d', '--debug',      type=bool, help='Debugging mode',        default=False, choices=[True, False])
 parser.add_argument('-l', '--loops',      type=int,  help='Number of outputs',     default=5)
 parser.add_argument('-L', '--logging',    type=bool, help='Storing in .CSV files', default=False, choices=[True, False])
 parser.add_argument('-m', '--model',      type=int,  help='Select device model',   default=6262,  choices=[820, 840, 6262, 7000])
@@ -49,7 +49,9 @@ LOOPS      = args.loops             # Nr of data extractions
 
 FREQ    = 5
 PORT0   = '/dev/ttyUSB0'
+PORTA   = '/dev/pts/9'
 PORT1   = '/dev/ttyUSB1'
+PORTB   = '/dev/pts/10'
 PORT2   = '/dev/ttyUSB2'
 PORT3   = '/dev/ttyUSB3'
 PORT4   = '/dev/ttyUSB4'
@@ -117,8 +119,16 @@ if __name__ == '__main__':
 
             Li820 = lm.logManager(queue=(q_in, q_out), kwargs=(args_list))
 
-            if not li8xStatus: li8xStatus = 1; Li820.start(); Li820.read(mode='logger')
-            else:              li8xStatus = 0; Li820.stop()
+            if not li8xStatus:
+                li8xStatus = 1;
+                Li820.start();
+                #Li820.read(mode='logger')
+                t_Li820 = Thread(target=Li820.read, name='Licor8xx', kwargs={'mode':'logger'})
+                t_Li820.start()
+
+            else:
+                li8xStatus = 0;
+                #Li820.stop()
 
         elif user_input is '2':
             args_list['port'] = PORT1
@@ -128,8 +138,16 @@ if __name__ == '__main__':
 
             Li6262 = lm.logManager(queue=(q_in, q_out), kwargs=(args_list))
 
-            if not li6xStatus: li6xStatus = 1; Li6262.start(); Li6262.read(mode='logger')
-            else:              li6xStatus = 0; Li6262.stop()
+            if not li6xStatus:
+                li6xStatus = 1;
+                Li6262.start();
+                #Li6262.read(mode='logger')
+                t_Li6262 = Thread(target=Li6262.read, name='Licor6xx', kwargs={'mode':'logger'})
+                t_Li6262.start()
+
+            else:
+                li6xStatus = 0;
+                #Li6262.stop()
 
         elif user_input is '3':
             args_list['port'] = I2C0
@@ -138,8 +156,8 @@ if __name__ == '__main__':
             o_id2 = o_id
 
         elif user_input is 'q' or 'Q':
-            if (li8xStatus): Li820.stop()
-            if (li6xStatus): Li6262.stop()
+#            if (li8xStatus): Li820.stop()
+#            if (li6xStatus): Li6262.stop()
             exitFlag = 1
 
         else: pass
