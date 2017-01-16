@@ -10,8 +10,6 @@ import os
 import datetime
 import serial
 
-from multiprocessing import Process
-
 # External libraries
 import file_manager as fm
 
@@ -24,7 +22,7 @@ import file_manager as fm
   ##################
 
 class Licor6xx:
-    def __init__(self, queue, header, kwargs):
+    def __init__(self, queue, kwargs):
         self.port       = kwargs['port']
         self.baud       = kwargs['baud']
         self.timeout    = kwargs['timeout']
@@ -36,8 +34,7 @@ class Licor6xx:
         self.device     = kwargs['device']
 
         self.q_in, self.q_out = queue
-        self.header = header
-
+        
         fp = fm.fManager('config/.cfg', 'r')
         fp.open()
         fp.cfg_loader()
@@ -47,7 +44,6 @@ class Licor6xx:
         # Read from the device
         else:             self._header = [ line.strip() for line in fp.get_cfg('li6262read') ]
 
-        self.header.put(self._header)
         fp.close()
 
     def connect(self):

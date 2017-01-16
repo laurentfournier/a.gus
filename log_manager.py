@@ -10,8 +10,9 @@ import os, sys, subprocess
 import datetime
 import argparse
 
-from multiprocessing import Process, Queue, Pipe
+from multiprocessing import Process#, Queue, Pipe
 from threading       import Timer
+from Queue           import Queue
 
 import signal
 signal.signal(signal.SIGINT, signal.default_int_handler)
@@ -55,14 +56,13 @@ class logManager:
         self.fname = ''
         
         self.q_in, self.q_out = queue
-        self.q_header = Queue()
 
     # Connect to device
     def start(self):
         try:
-            if   (self.device == 820 or self.device == 840): self.probe = Licor8xx((self.q_in, self.q_out), self.q_header, self.kwargs)            
-            elif (self.device == 6262):                      self.probe = Licor6xx((self.q_in, self.q_out), self.q_header, self.kwargs)            
-            elif (self.device == 7000):                      self.probe = Licor7xx((self.q_in, self.q_out), self.q_header, self.kwargs)
+            if   (self.device == 820 or self.device == 840): self.probe = Licor8xx((self.q_in, self.q_out), self.kwargs)            
+            elif (self.device == 6262):                      self.probe = Licor6xx((self.q_in, self.q_out), self.kwargs)            
+            elif (self.device == 7000):                      self.probe = Licor7xx((self.q_in, self.q_out), self.kwargs)
 
             self.probe.connect()
 
@@ -113,7 +113,7 @@ class logManager:
                     try:
                         # Read from device
                         buff = data = self.probe.read()
-                        self.q_out.put(buff)
+                        ###self.q_out.put(buff)
 
                         # Write data
                         fp.write(';'.join(data))
@@ -139,7 +139,7 @@ class logManager:
                     try:
                         # Read from device
                         data = self.probe.read()
-                        self.q_out.put(data)
+                        ###self.q_out.put(data)
 
                         # Do only once per minute
                         while (datetime.datetime.now().strftime("%S") == "00"):

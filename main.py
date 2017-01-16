@@ -10,8 +10,9 @@ import os, sys, subprocess
 import datetime
 import argparse
 
-from multiprocessing import Process, Queue, Pipe
+from multiprocessing import Process#, Queue, Pipe
 from threading       import Timer, Thread
+from Queue           import Queue
 import subprocess
 
 import signal
@@ -50,9 +51,7 @@ LOOPS      = args.loops             # Nr of data extractions
 
 FREQ    = 5
 PORT0   = '/dev/ttyUSB0'
-PORTA   = '/dev/pts/9'
 PORT1   = '/dev/ttyUSB1'
-PORTB   = '/dev/pts/10'
 PORT2   = '/dev/ttyUSB2'
 PORT3   = '/dev/ttyUSB3'
 PORT4   = '/dev/ttyUSB4'
@@ -84,6 +83,7 @@ i2cStatus  = 0
 #-------------------------------------------------------------
 if __name__ == '__main__':
     os.system('clear')
+    
     while not exitFlag:
         if (li8xStatus is True): print ("Li820:  Active")
         else:                    print ("Li820:  Inactive")
@@ -107,7 +107,10 @@ if __name__ == '__main__':
                                "\t|-----------------|\n")
         os.system('clear')
 
-        if   user_input is '0': pass
+        if   user_input is '0':
+            print ("q.get1 :  {}").format(q_out.get())
+            print ("q.get2 :  {}").format(q_out.get())
+            
 
         elif user_input is '1':
             args_list['port'] = PORT0
@@ -120,7 +123,11 @@ if __name__ == '__main__':
             if not li8xStatus:
                 li8xStatus = True;
                 Li820.start();
-                p_Li820 = Process(target=Li820.read, name='Licor8xx', kwargs={'mode':'logger'})
+                
+                p_Li820 = Process(target=Li820.read,
+                                  name='Licor8xx',
+                                  kwargs={'mode':'logger'})
+                
                 p_Li820.daemon = True
                 p_Li820.start()
 
@@ -139,7 +146,11 @@ if __name__ == '__main__':
             if not li6xStatus:
                 li6xStatus = True;
                 Li6262.start();
-                p_Li6262 = Process(target=Li6262.read, name='Licor6xx', kwargs={'mode':'logger'})
+                
+                p_Li6262 = Process(target=Li6262.read,
+                                   name='Licor6xx',
+                                   kwargs={'mode':'logger'})
+                
                 p_Li6262.daemon = True
                 p_Li6262.start()
 
@@ -155,10 +166,9 @@ if __name__ == '__main__':
 
         elif user_input is 'q' or 'Q':
             #subprocess.call("join -t ';' '{}' '{}' > logs/test.csv".format(Li820.path+Li820.fname, Li6262.path+Li6262.fname))
-            print Li820.fname
-            
             if (li8xStatus): Li820.stop()
             if (li6xStatus): Li6262.stop()
             exitFlag = 1
 
         else: pass
+

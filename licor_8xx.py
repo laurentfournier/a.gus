@@ -14,8 +14,6 @@ import serial
 from bs4         import BeautifulSoup as bs
 from lxml        import etree
 
-from multiprocessing import Process
-
 # External libraries
 import file_manager as fm
 
@@ -27,8 +25,8 @@ import file_manager as fm
   # Initialisation #
   ##################
 
-class Licor8xx(Process):
-    def __init__(self, pipe, header, kwargs):
+class Licor8xx:
+    def __init__(self, queue, kwargs):
         self.port       = kwargs['port']
         self.baud       = kwargs['baud']
         self.timeout    = kwargs['timeout']
@@ -39,9 +37,8 @@ class Licor8xx(Process):
         self.loops      = kwargs['loops']
         self.device     = kwargs['device']
 
-        self.p_in, self.p_out = pipe
-        self.header = header
-
+        self.q_in, self.q_out = queue
+        
         fp = fm.fManager('config/.cfg', 'r')
         fp.open()
         fp.cfg_loader()
@@ -56,7 +53,6 @@ class Licor8xx(Process):
             elif (self.device == 840):  self._header = [ line.strip() for line in fp.get_cfg('li840read') ]
             else: print ("Wrong device's Model")
 
-        self.header.put(self._header)
         fp.close()
 
     def connect(self):
@@ -104,7 +100,7 @@ class Licor8xx(Process):
                     raw.celltemp.string, raw.cellpres.string, raw.co2.string, raw.h2o.string, raw.h2odewpoint, ]
 
         self.res = res
-        self.p_out.put(res)
+        self.q_out.put(res)
 
         if self.debug:
             print ("\nNew Data Point")
