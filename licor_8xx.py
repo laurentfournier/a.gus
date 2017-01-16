@@ -63,8 +63,11 @@ class Licor8xx(Process):
         try:
             # Connect to serial device
             self.con = serial.Serial(self.port, self.baud, timeout=self.timeout)
+            # Wash buffers
             self.con.flushInput()
             self.con.flushOutput()
+            #self.con.reset_input_buffer()
+            #self.con.reset_output_buffer()
 
         except Exception as e:
             self.con = None
@@ -74,6 +77,9 @@ class Licor8xx(Process):
 
     def disconnect(self):
         try:
+            self.con.reset_input_buffer()
+            self.con.reset_output_buffer()
+            self.con.flush()
             self.con.close()
             self.con.__del__()
 
@@ -84,9 +90,10 @@ class Licor8xx(Process):
         return True
 
     def read(self):
+        self.con.readline()
+        
         # Define data structure
         if self.device == 820:
-            self.con.readline()
             raw = bs(self.con.readline(), 'lxml')
             raw = raw.li820.data
             
@@ -94,7 +101,6 @@ class Licor8xx(Process):
                     raw.celltemp.string, raw.cellpres.string, raw.co2.string, ]
 
         elif self.device == 840:
-            self.con.readline()
             raw = bs(self.con.readline(), 'lxml')
             raw = raw.li840.data
             

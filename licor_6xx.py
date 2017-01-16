@@ -76,10 +76,11 @@ class Licor6xx:
         return True
 
     def read(self):
+        self.con.readline()
+        
         raw = self.con.readline()
-
         res = [ datetime.datetime.now().strftime('%Y-%m-%d'), datetime.datetime.now().strftime('%H:%M:%S'),
-                raw.split()[0], raw.split()[1], raw.split()[2], raw.split()[3], raw.split()[4] ]
+                raw.split()[0], raw.split()[1], raw.split()[2], raw.split()[3], ]  # raw.split()[4]  
 
         self.res = res
         self.q_out.put(res)

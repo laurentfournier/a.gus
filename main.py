@@ -12,6 +12,7 @@ import argparse
 
 from multiprocessing import Process, Queue, Pipe
 from threading       import Timer, Thread
+import subprocess
 
 import signal
 signal.signal(signal.SIGINT, signal.default_int_handler)
@@ -32,7 +33,7 @@ parser.add_argument('-c', '--continuous', type=bool, help='No outputs limitation
 parser.add_argument('-C', '--config',     type=bool, help='Configuration mode',    default=False, choices=[True, False])
 parser.add_argument('-d', '--debug',      type=bool, help='Debugging mode',        default=False, choices=[True, False])
 parser.add_argument('-l', '--loops',      type=int,  help='Number of outputs',     default=5)
-parser.add_argument('-L', '--logging',    type=bool, help='Storing in .CSV files', default=False, choices=[True, False])
+parser.add_argument('-L', '--logging',    type=bool, help='Storing in .CSV files', default=True, choices=[True, False])
 parser.add_argument('-m', '--model',      type=int,  help='Select device model',   default=6262,  choices=[820, 840, 6262, 7000])
 args = parser.parse_args()
 
@@ -71,11 +72,8 @@ args_list  = { 'port' : PORT0,   'baud': BAUD,             'timeout': TIMEOUT,
 q_in  = Queue()
 q_out = Queue()
 
-#data     = 0.0
-#cnt      = 0
 exitFlag = 0
 
-#probe      = []
 o_id       = -1
 li8xStatus = 0
 li6xStatus = 0
@@ -122,12 +120,12 @@ if __name__ == '__main__':
             if not li8xStatus:
                 li8xStatus = True;
                 Li820.start();
-                t_Li820 = Thread(target=Li820.read, name='Licor8xx', kwargs={'mode':'logger'})
-                t_Li820.start()
+                p_Li820 = Process(target=Li820.read, name='Licor8xx', kwargs={'mode':'logger'})
+                p_Li820.daemon = True
+                p_Li820.start()
 
             else:
                 li8xStatus = False;
-                t_Li820.terminate()
                 Li820.stop()
 
         elif user_input is '2':
@@ -141,12 +139,12 @@ if __name__ == '__main__':
             if not li6xStatus:
                 li6xStatus = True;
                 Li6262.start();
-                t_Li6262 = Thread(target=Li6262.read, name='Licor6xx', kwargs={'mode':'logger'})
-                t_Li6262.start()
+                p_Li6262 = Process(target=Li6262.read, name='Licor6xx', kwargs={'mode':'logger'})
+                p_Li6262.daemon = True
+                p_Li6262.start()
 
             else:
                 li6xStatus = False;
-                t_Li6262.terminate()
                 Li6262.stop()
 
         elif user_input is '3':
@@ -156,6 +154,9 @@ if __name__ == '__main__':
             o_id2 = o_id
 
         elif user_input is 'q' or 'Q':
+            #subprocess.call("join -t ';' '{}' '{}' > logs/test.csv".format(Li820.path+Li820.fname, Li6262.path+Li6262.fname))
+            print Li820.fname
+            
             if (li8xStatus): Li820.stop()
             if (li6xStatus): Li6262.stop()
             exitFlag = 1

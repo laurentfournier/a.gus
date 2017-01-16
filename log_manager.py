@@ -50,6 +50,9 @@ class logManager:
         self.loops      = kwargs['loops']
         self.device     = kwargs['device']
         self.kwargs     = kwargs
+
+        self.path  = ''
+        self.fname = ''
         
         self.q_in, self.q_out = queue
         self.q_header = Queue()
@@ -69,7 +72,12 @@ class logManager:
 
     # Disconnect to device
     def stop(self):
-        self.probe.disconnect()
+        try:
+            self.loops = 0
+            self.probe.disconnect()
+            
+        except Exception as e:
+            if (self.debug): print ("ERROR: {}".format(e))
         
     # Configure the device
     def write(self, mode):
@@ -101,7 +109,6 @@ class logManager:
                 fp.write('\n')
 
                 while (self.loops):
-                    data = self.probe.read()
 #                    if (datetime.datetime.now().strftime("%S") == "00"):
                     try:
                         # Read from device
@@ -112,6 +119,8 @@ class logManager:
                         fp.write(';'.join(data))
                         fp.write('\n')
 
+                        fp.flush()
+                        os.fsync(fp)
                         # Do only once per minute
 #                            while (datetime.datetime.now().strftime("%S") == "00"):
 #                                pass
