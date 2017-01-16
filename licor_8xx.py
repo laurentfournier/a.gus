@@ -66,8 +66,6 @@ class Licor8xx(Process):
             # Wash buffers
             self.con.flushInput()
             self.con.flushOutput()
-            #self.con.reset_input_buffer()
-            #self.con.reset_output_buffer()
 
         except Exception as e:
             self.con = None
@@ -77,8 +75,6 @@ class Licor8xx(Process):
 
     def disconnect(self):
         try:
-            self.con.reset_input_buffer()
-            self.con.reset_output_buffer()
             self.con.flush()
             self.con.close()
             self.con.__del__()

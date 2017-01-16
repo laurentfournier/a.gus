@@ -66,6 +66,7 @@ class Licor6xx:
 
     def disconnect(self):
         try:
+            self.con.flush()
             self.con.close()
             self.con.__del__()
 
