@@ -7,38 +7,28 @@
     Modifications by Laurent Fournier, October 2016
 '''
 
-import os
-import datetime
-import serial
+import os, datetime, serial
 
-from bs4         import BeautifulSoup as bs
-from lxml        import etree
+from bs4  import BeautifulSoup as bs
+from lxml import etree
 
 # External libraries
 import file_manager as fm
-
-#-------------------------------------------------------------
-#----- Better know what you are doing from this point --------
-#-------------------------------------------------------------
 
   ##################
   # Initialisation #
   ##################
 
 class Licor8xx:
-    def __init__(self, queue, kwargs):
-        self.port       = kwargs['port']
-        self.baud       = kwargs['baud']
-        self.timeout    = kwargs['timeout']
-        self.config     = kwargs['config']
-        self.continuous = kwargs['continuous']
-        self.debug      = kwargs['debug']
-        self.log        = kwargs['log']
-        self.loops      = kwargs['loops']
-        self.device     = kwargs['device']
+    def __init__(self, data, device):
+        self.port    = device['port']
+        self.baud    = device['baud']
+        self.timeout = device['timeout']
+        self.debug   = device['debug']
+        self.device  = device['device']
 
-        self.q_in, self.q_out = queue
-        
+        self.q_data, self.q_header = data
+
         fp = fm.fManager('config/.cfg', 'r')
         fp.open()
         fp.cfg_loader()
@@ -53,6 +43,7 @@ class Licor8xx:
             elif (self.device == 840):  self._header = [ line.strip() for line in fp.get_cfg('li840read') ]
             else: print ("Wrong device's Model")
 
+        self.q_header.put(self._header)
         fp.close()
 
     def connect(self):
@@ -83,24 +74,23 @@ class Licor8xx:
 
     def read(self):
         self.con.readline()
-        
+
         # Define data structure
         if self.device == 820:
             raw = bs(self.con.readline(), 'lxml')
             raw = raw.li820.data
-            
+
             res = [ datetime.datetime.now().strftime('%Y-%m-%d'), datetime.datetime.now().strftime('%H:%M:%S'),
                     raw.celltemp.string, raw.cellpres.string, raw.co2.string, ]
 
         elif self.device == 840:
             raw = bs(self.con.readline(), 'lxml')
             raw = raw.li840.data
-            
+
             res = [ datetime.datetime.now().strftime('%Y-%m-%d'), datetime.datetime.now().strftime('%H:%M:%S'),
                     raw.celltemp.string, raw.cellpres.string, raw.co2.string, raw.h2o.string, raw.h2odewpoint, ]
 
-        self.res = res
-        self.q_out.put(res)
+        self.q_data.put(res)
 
         if self.debug:
             print ("\nNew Data Point")

@@ -6,35 +6,25 @@
     Written by Laurent Fournier, November 2016
 '''
 
-import os
-import datetime
-import serial
+import os, datetime, serial
 
 # External libraries
 import file_manager as fm
-
-#-------------------------------------------------------------
-#----- Better know what you are doing from this point --------
-#-------------------------------------------------------------
 
   ##################
   # Initialisation #
   ##################
 
 class Licor6xx:
-    def __init__(self, queue, kwargs):
-        self.port       = kwargs['port']
-        self.baud       = kwargs['baud']
-        self.timeout    = kwargs['timeout']
-        self.config     = kwargs['config']
-        self.continuous = kwargs['continuous']
-        self.debug      = kwargs['debug']
-        self.log        = kwargs['log']
-        self.loops      = kwargs['loops']
-        self.device     = kwargs['device']
+    def __init__(self, data, device):
+        self.port    = device['port']
+        self.baud    = device['baud']
+        self.timeout = device['timeout']
+        self.debug   = device['debug']
+        self.device  = device['device']
 
-        self.q_in, self.q_out = queue
-        
+        self.q_data, self.q_header = data
+
         fp = fm.fManager('config/.cfg', 'r')
         fp.open()
         fp.cfg_loader()
@@ -44,6 +34,7 @@ class Licor6xx:
         # Read from the device
         else:             self._header = [ line.strip() for line in fp.get_cfg('li6262read') ]
 
+        self.q_header.put(self._header)
         fp.close()
 
     def connect(self):
@@ -74,13 +65,12 @@ class Licor6xx:
 
     def read(self):
         self.con.readline()
-        
+
         raw = self.con.readline()
         res = [ datetime.datetime.now().strftime('%Y-%m-%d'), datetime.datetime.now().strftime('%H:%M:%S'),
-                raw.split()[0], raw.split()[1], raw.split()[2], raw.split()[3], ]  # raw.split()[4]  
+                raw.split()[0], raw.split()[1], raw.split()[2], raw.split()[3], ]  # raw.split()[4]
 
-        self.res = res
-        self.q_out.put(res)
+        self.q_data.put(res)
 
         if self.debug:
             print ("\nNew Data Point")
