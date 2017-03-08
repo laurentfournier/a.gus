@@ -32,17 +32,19 @@ class Licor8xx:
         fp = fm.fManager('config/.cfg', 'r')
         fp.open()
         fp.cfg_loader()
-
-        if (self.config):                                                                 # Write to the device
+        
+        '''# Write to the device
+        if (self.config):
             if   (self.device == 820):  self._header = [ line.strip() for line in fp.get_cfg('li820write') ]
             elif (self.device == 840):  self._header = [ line.strip() for line in fp.get_cfg('li840write') ]
             else: print ("Wrong device's Model")
 
-        else:                                                                           # Read from the device
-            if   (self.device == 820):  self._header = [ line.strip() for line in fp.get_cfg('li820read') ]
-            elif (self.device == 840):  self._header = [ line.strip() for line in fp.get_cfg('li840read') ]
-            else: print ("Wrong device's Model")
-
+        # Read from the device
+        else:'''
+        if   (self.device is '820'):  self._header = [ line.strip() for line in fp.get_cfg('li820read') ]
+        elif (self.device is '840'):  self._header = [ line.strip() for line in fp.get_cfg('li840read') ]
+        else: print ("Wrong device's Model")
+        
         self.q_header.put(self._header)
         fp.close()
 
@@ -76,19 +78,17 @@ class Licor8xx:
         self.con.readline()
 
         # Define data structure
-        if self.device == 820:
+        if self.device is '820':
             raw = bs(self.con.readline(), 'lxml')
             raw = raw.li820.data
 
-            res = [ datetime.datetime.now().strftime('%Y-%m-%d'), datetime.datetime.now().strftime('%H:%M:%S'),
-                    raw.celltemp.string, raw.cellpres.string, raw.co2.string, ]
+            res = [ raw.celltemp.string, raw.cellpres.string, raw.co2.string, ]
 
-        elif self.device == 840:
+        elif self.device is '840':
             raw = bs(self.con.readline(), 'lxml')
             raw = raw.li840.data
 
-            res = [ datetime.datetime.now().strftime('%Y-%m-%d'), datetime.datetime.now().strftime('%H:%M:%S'),
-                    raw.celltemp.string, raw.cellpres.string, raw.co2.string, raw.h2o.string, raw.h2odewpoint, ]
+            res = [ raw.celltemp.string, raw.cellpres.string, raw.co2.string, raw.h2o.string, raw.h2odewpoint, ]
 
         self.q_data.put(res)
 
@@ -97,7 +97,7 @@ class Licor8xx:
             for each in zip(self._header, res):
                 print (each[0], each[1])
 
-        return self.res
+        return res
 
     # Write a complete instruction row
     def config_W(self):
@@ -138,4 +138,4 @@ class Licor8xx:
         return answer
 
     def __repr__(self):
-        return "Licor Model Li-{}".format(device_nr)
+        return "Licor Model Li-{}".format(self.device)

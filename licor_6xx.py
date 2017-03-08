@@ -29,10 +29,11 @@ class Licor6xx:
         fp.open()
         fp.cfg_loader()
 
-        # Write to the device
+        '''# Write to the device
         if (self.config): self._header = [ line.strip() for line in fp.get_cfg('li6262write') ]
         # Read from the device
-        else:             self._header = [ line.strip() for line in fp.get_cfg('li6262read') ]
+        else:'''
+        self._header = [ line.strip() for line in fp.get_cfg('li6262read') ]
 
         self.q_header.put(self._header)
         fp.close()
@@ -67,8 +68,7 @@ class Licor6xx:
         self.con.readline()
 
         raw = self.con.readline()
-        res = [ datetime.datetime.now().strftime('%Y-%m-%d'), datetime.datetime.now().strftime('%H:%M:%S'),
-                raw.split()[0], raw.split()[1], raw.split()[2], raw.split()[3], ]  # raw.split()[4]
+        res = [ raw.split()[0], raw.split()[1], raw.split()[2], raw.split()[3], ]  # raw.split()[4]
 
         self.q_data.put(res)
 
@@ -77,7 +77,7 @@ class Licor6xx:
             for each in zip(self._header, res):
                 print (each[0], each[1])
 
-        return self.res
+        return res
 
     # Write a complete instruction row
     def config_W(self):
@@ -101,4 +101,4 @@ class Licor6xx:
         return answer
 
     def __repr__(self):
-        return "Licor Model Li-{}".format(device_nr)
+        return "Licor Model Li-{}".format(self.device)

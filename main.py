@@ -47,8 +47,8 @@ PORT   = [ '/dev/ttyUSB0', '/dev/ttyUSB1', '/dev/ttyUSB2', '/dev/ttyUSB3',
 DEVICE = [ '820',          '840',          '6262',         '7000',
            'i2c1',         'i2c2' ]
 
-args_device = { 'port' : PORT[0], 'baud': BAUD,   'timeout': TIMEOUT,
-                'config': CONFIG, 'device': DEVICE[0] }
+args_device = { 'port':PORT[0],  'baud':BAUD,   'timeout':TIMEOUT,
+                'config':CONFIG, 'debug':DEBUG, 'device':DEVICE[0] }
 
 q_data   = Queue()
 q_header = Queue()
@@ -93,6 +93,9 @@ if __name__ == '__main__':
             logger = lm.logManager((q_data, q_header), devices, DEBUG)
             logger.start()
 
+            t_logg = Process(target=logger.read)
+            t_logg.start()
+
         elif user_input is '1':
             probeCnt += 1
             args_device['id']     = probeCnt
@@ -130,6 +133,7 @@ if __name__ == '__main__':
             else:           i2cFlag = False
 
         elif user_input is 'q' or 'Q':
+            t_logg.terminate()
             logger.stop()
             exitFlag = True
 
