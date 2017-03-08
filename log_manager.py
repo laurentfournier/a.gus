@@ -107,29 +107,31 @@ class logManager:
             fp.write('\n')
 
             while self.run is True:
-                #if (datetime.datetime.now().strftime("%S") == "00"):
-                try:
-                    # Read from device
-                    for i in range(len(self.probes)):
-                        self.probes[i].read()
+                if (datetime.datetime.now().strftime("%S") == "00"):
+                    try:
+                        # Read from device
+                        for i in range(len(self.probes)):
+                            self.probes[i].read()
 
-                    fp.write('{};{};'.format(date, time))                        
+                        fp.write('{};{};'.format(datetime.datetime.now().strftime('%Y-%m-%d'),
+                                                 datetime.datetime.now().strftime('%H:%M:%S')))                        
 
-                    while not self.q_data.empty():
-                        data = self.q_data.get()
-                        # Write data
-                        fp.write(';'.join(data))
+                        while not self.q_data.empty():
+                            data = self.q_data.get()
+                            # Write data
+                            fp.write(';'.join(data))
+                            
+                            fp.write(';')
+                        fp.write('\n')
+
+                        fp.flush()
+                        os.fsync(fp)
                         
-                        fp.write(';')
-                    fp.write('\n')
+                        # Do only once per minute
+                        while (datetime.datetime.now().strftime("%S") == "00"):
+                            pass
 
-                    fp.flush()
-                    os.fsync(fp)
-                # Do only once per minute
-                #while (datetime.datetime.now().strftime("%S") == "00"):
-                    #pass
-
-                except Exception as e:
-                    if (self.debug): print ("ERROR: {}".format(e))
+                    except Exception as e:
+                        if (self.debug): print ("ERROR: {}".format(e))
 
             fp.close()

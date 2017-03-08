@@ -2,4 +2,6 @@ python-bs4
 python-lxml
 python-crontab
 python-smbus
+python-pyglet
+python-docutils
 cython
