@@ -205,7 +205,7 @@ class AgusRoot(TabbedPanel):
         self.label_wid2.text = 'Licor {} - {} - {}'.format(self.get_device(devices[1], 'device'), self.switch_wid2.active, self.get_device(devices[1], 'port'))
         self.info2 = str(self.get_device(devices[1], 'state'))
 
-        #self.set_probes()
+        self.set_probes()
 
     def set_probes(self):
         try:
