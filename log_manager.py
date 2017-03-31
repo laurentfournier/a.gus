@@ -36,8 +36,10 @@ class logManager:
     def __init__(self, data, devices, debug):
         self.devices = devices
         self.debug   = debug
-        
-        self.q_data, self.q_header = data
+
+        self.q_data_out, self.q_header_out = data
+        self.q_data_in   = Queue()
+        self.q_header_in = Queue()
 
         self.probes = []
         self.buffer = []
@@ -47,14 +49,15 @@ class logManager:
     def start(self):
         try:
             for i in range(len(self.devices)):
-                if   (self.devices[i]['device'] is '820'):  self.probes.append(Licor8xx((self.q_data, self.q_header), self.devices[i]))
-                elif (self.devices[i]['device'] is '840'):  self.probes.append(Licor8xx((self.q_data, self.q_header), self.devices[i]))
-                elif (self.devices[i]['device'] is '6262'): self.probes.append(Licor6xx((self.q_data, self.q_header), self.devices[i]))
-                elif (self.devices[i]['device'] is '7000'): self.probes.append(Licor7xx((self.q_data, self.q_header), self.devices[i]))
+                if (self.devices[i]['state'] is True):
+                    if   (self.devices[i]['device'] is '820'):  self.probes.append(Licor8xx((self.q_data_in, self.q_header_in), self.devices[i]))
+                    elif (self.devices[i]['device'] is '840'):  self.probes.append(Licor8xx((self.q_data_in, self.q_header_in), self.devices[i]))
+                    elif (self.devices[i]['device'] is '6262'): self.probes.append(Licor6xx((self.q_data_in, self.q_header_in), self.devices[i]))
+                    elif (self.devices[i]['device'] is '7000'): self.probes.append(Licor7xx((self.q_data_in, self.q_header_in), self.devices[i]))
 
             self.run = True
-                
-            for i in range(len(self.probes)):    
+
+            for i in range(len(self.probes)):
                 self.probes[i].connect()
 
         except Exception as e:
@@ -87,9 +90,12 @@ class logManager:
         date_time = datetime.datetime.now()
         date      = datetime.datetime.now().strftime('%Y-%m-%d')
         time      = datetime.datetime.now().strftime('%H:%M:%S')
-        
+
         path      = '{}'.format(LOG_DIR)
         filename  = '{}data-{}.csv'.format(path, date_time)
+
+        self.q_header_out = self.q_header_in
+        self.q_data_out   = self.q_data_in
 
         # Verify if directory already exists
         if not (os.path.isdir(path)):
@@ -99,9 +105,8 @@ class logManager:
         with open(filename, 'w') as fp:
             fp.write('Date;Time;')
 
-            while not self.q_header.empty():
-                header = self.q_header.get()
-                
+            while not self.q_header_in.empty():
+                header = self.q_header_in.get()
                 # Write headers
                 fp.write(';'.join(header))
             fp.write('\n')
@@ -114,19 +119,19 @@ class logManager:
                             self.probes[i].read()
 
                         fp.write('{};{};'.format(datetime.datetime.now().strftime('%Y-%m-%d'),
-                                                 datetime.datetime.now().strftime('%H:%M:%S')))                        
+                                                 datetime.datetime.now().strftime('%H:%M:%S')))
 
-                        while not self.q_data.empty():
-                            data = self.q_data.get()
+                        while not self.q_data_in.empty():
+                            data = self.q_data_in.get()
+
                             # Write data
                             fp.write(';'.join(data))
-                            
                             fp.write(';')
                         fp.write('\n')
 
                         fp.flush()
                         os.fsync(fp)
-                        
+
                         # Do only once per minute
                         while (datetime.datetime.now().strftime("%S") == "00"):
                             pass
@@ -135,3 +140,10 @@ class logManager:
                         if (self.debug): print ("ERROR: {}".format(e))
 
             fp.close()
+
+    def get_data(self):
+        try:
+            return (self.q_data_out, self.q_header_out)
+
+        except Exception as e:
+            if (self.debug): print e

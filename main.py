@@ -6,22 +6,46 @@
     Written by Laurent Fournier, October 2016
 '''
 
-import os, sys, datetime, argparse
-from copy import deepcopy
-
+from copy            import deepcopy
 from multiprocessing import Process
-from threading       import Timer, Thread#, Queue, Pipe
 from Queue           import Queue
+from threading       import Timer, Thread
+
+import os, sys
+import argparse
+import datetime
+import json
 import subprocess
 
 import signal
 signal.signal(signal.SIGINT, signal.default_int_handler)
 
+# Kivy libraries
+from kivy.app               import App
+from kivy.clock             import Clock
+from kivy.factory           import Factory
+from kivy.properties        import (ListProperty, NumericProperty, ObjectProperty, OptionProperty, StringProperty)
+from kivy.storage.jsonstore import JsonStore
+
+from kivy.uix.accordion   import Accordion, AccordionItem
+from kivy.uix.boxlayout   import BoxLayout
+from kivy.uix.button      import Button
+from kivy.uix.floatlayout import FloatLayout
+from kivy.uix.label       import Label
+from kivy.uix.listview    import ListItemButton
+from kivy.uix.modalview   import ModalView
+from kivy.uix.popup       import Popup
+from kivy.uix.settings    import Settings, SettingsWithSidebar
+from kivy.uix.switch      import Switch
+from kivy.uix.tabbedpanel import TabbedPanel
+from kivy.uix.widget      import Widget
+
 # External libraries
 import log_manager as lm
 
+
 #-------------------------------------------------------------
-#------------------ Open configurations ----------------------
+#--------------------- Configurations ------------------------
 #-------------------------------------------------------------
 
   ############
@@ -48,7 +72,8 @@ DEVICE = [ '820',          '840',          '6262',         '7000',
            'i2c1',         'i2c2' ]
 
 args_device = { 'port':PORT[0],  'baud':BAUD,   'timeout':TIMEOUT,
-                'config':CONFIG, 'debug':DEBUG, 'device':DEVICE[0] }
+                'config':CONFIG, 'debug':DEBUG, 'device':DEVICE[0],
+                'state':False}
 
 q_data   = Queue()
 q_header = Queue()
@@ -60,10 +85,15 @@ li6xFlag  =  False
 i2cFlag   =  False
 probeCnt  = -1
 
+
 #-------------------------------------------------------------
-#----------------------- Main program ------------------------
+#-------------------- Debugging program ----------------------
 #-------------------------------------------------------------
-if __name__ == '__main__':
+def DebugApp():
+    global exitFlag, li8xFlag, li6xFlag, i2cFlag, probeCnt
+    global DEBUG, CONFIG, BAUD, TIMEOUT, PORT, DEVICE
+    global args_device, q_data, q_header, devices
+
     os.system('clear')
 
     while not exitFlag:
@@ -102,7 +132,7 @@ if __name__ == '__main__':
             args_device['name']   = 'Licor820'
             args_device['port']   = PORT[0]
             args_device['device'] = DEVICE[0]
-            
+
             devices.append(deepcopy(args_device))
 
             if not li8xFlag: li8xFlag = True
@@ -114,7 +144,7 @@ if __name__ == '__main__':
             args_device['name']   = 'Licor6262'
             args_device['port']   = PORT[1]
             args_device['device'] = DEVICE[2]
-            
+
             devices.append(deepcopy(args_device))
 
             if not li6xFlag: li6xFlag = True
@@ -126,7 +156,7 @@ if __name__ == '__main__':
             args_device['name']   = 'I2C'
             args_device['port']   = PORT[4]
             args_device['device'] = DEVICE[4]
-            
+
             devices.append(deepcopy(args_device))
 
             if not i2cFlag: i2cFlag = True
@@ -138,3 +168,126 @@ if __name__ == '__main__':
             exitFlag = True
 
         else: pass
+
+
+#-------------------------------------------------------------
+#----------------------- Main program ------------------------
+#-------------------------------------------------------------
+class ThreadData(BoxLayout):
+    abs
+
+class ThreadPlot(BoxLayout):
+    abs
+
+class AgusRoot(TabbedPanel):
+    label_wid1  = ObjectProperty();
+    switch_wid1 = ObjectProperty();
+    spin_wid1   = ObjectProperty()
+
+    label_wid2  = ObjectProperty();
+    switch_wid2 = ObjectProperty();
+    spin_wid2   = ObjectProperty()
+
+    carousel    = ObjectProperty()
+    info1       = StringProperty()
+    info2       = StringProperty()
+
+    no_Device   = False
+
+    def get_probes(self):
+        self.set_device(devices[0], 'state', self.switch_wid1.active)
+        self.set_device(devices[0], 'port',  self.spin_wid1.text)
+        self.label_wid1.text = 'Licor {} - {} - {}'.format(self.get_device(devices[0], 'device'), self.switch_wid1.active, self.get_device(devices[0], 'port'))
+        self.info1 = str(self.get_device(devices[0], 'state'))
+
+        self.set_device(devices[1], 'state', self.switch_wid2.active)
+        self.set_device(devices[1], 'port',  self.spin_wid2.text)
+        self.label_wid2.text = 'Licor {} - {} - {}'.format(self.get_device(devices[1], 'device'), self.switch_wid2.active, self.get_device(devices[1], 'port'))
+        self.info2 = str(self.get_device(devices[1], 'state'))
+
+        #self.set_probes()
+
+    def set_probes(self):
+        try:
+            logger = lm.logManager((q_data, q_header), devices, DEBUG)
+            logger.start()
+
+            t_logg = Process(target=logger.read)
+            t_logg.start()
+
+        except:
+            no_Device = True
+
+        finally:
+            pass
+
+    def exit_app(self):
+        t_logg.terminate()
+        logger.stop()
+        os.system("sudo shutdown now -h")
+
+    def get_ports(self):
+        # get active ports as text label:
+        result1_1 = self.get_device(devices[0], 'port')
+        result1_2 = self.get_device(devices[1], 'port')
+        self.spin_wid1.text = str(result1_1)
+        self.spin_wid2.text = str(result1_2)
+
+        # get all other ports as list of values:
+        result2 = PORT
+        self.spin_wid1.values = map(str, result2)
+        self.spin_wid2.values = map(str, result2)
+
+    def set_ports(self):
+        todo
+
+    def get_data(self):
+        todo
+
+    def set_data(self):
+        todo
+
+    def get_device(self, device, tag):
+        return device[tag]
+
+    def set_device(self, device, tag, content):
+        device[tag] = content
+
+
+class AgusApp(App):
+    def build_config(self, config):
+        config.setdefaults('General', {'gps' : 'Enabled', 'fullscreen' : 'True'})
+
+    def build_settings(self, settings):
+        settings.add_json_panel("a.gus", self.config, data = """
+            [
+                {"type": "options", "title": "GPS", "section": "General", "key": "gps", "options": ["Enabled", "Disabled"]},
+                {"type": "options", "title": "Fullscreen", "section": "General", "key": "fullscreen", "options": ["True", "False"]}
+            ]""")
+
+    def on_config_change(self, config, section, key, value):
+        if config is self.config:
+            if (key == "gps"):
+                try:
+                    '''self.root.current_weather.update_weather()
+                    self.root.forecast.update_weather()'''
+
+                except AttributeError:
+                    pass
+
+if __name__ == '__main__':
+    if DEBUG:
+        DebugApp()
+
+    else:
+        args_device['name']   = 'Licor820'
+        args_device['port']   = PORT[0]
+        args_device['device'] = DEVICE[0]
+        devices.append(deepcopy(args_device))
+
+        args_device['name']   = 'Licor6262'
+        args_device['port']   = PORT[1]
+        args_device['device'] = DEVICE[2]
+        devices.append(deepcopy(args_device))
+
+        AgusApp().run()
