@@ -76,21 +76,29 @@ AgusRoot:
                     allow_stretch: True
                     keep_ratio: True
 
-            Button:
-                id: but_start
-                size_hint: None, None
-                pos_hint: {'right' : .8, 'bottom' : 1}
-                size: '150dp', '36dp'
-                text: 'Start' # root.info
-                on_press: root.get_probes()
+            BoxLayout:
+                pos_hint: {'x' : .2, 'y' : .1}
 
-            Button:
-                id: but_stop
-                size_hint: None, None
-                pos_hint: {'right' : 1, 'bottom' : 1}
-                size: '150dp', '36dp'
-                text: 'Exit' # root.info
-                on_press: root.exit_app()
+                Button:
+                    id: but_start
+                    size_hint: None, None
+                    size: '150dp', '36dp'
+                    text: 'Start' # root.info
+                    on_press: root.get_probes()
+
+                Button:
+                    id: but_fexpl
+                    size_hint: None, None
+                    size: '150dp', '36dp'
+                    text: 'Explorer'
+                    on_press: root.open_fexpl()
+
+                Button:
+                    id: but_stop
+                    size_hint: None, None
+                    size: '150dp', '36dp'
+                    text: 'Exit' # root.info
+                    on_press: root.exit_app()
 
 
     #########################

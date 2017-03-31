@@ -228,7 +228,7 @@ class AgusRoot(TabbedPanel):
             pass
 
     def exit_app(self):
-        #self.t_logg.terminate()
+        self.t_logg.terminate()
         self.logger.stop()
         sys.exit()
 
@@ -258,6 +258,9 @@ class AgusRoot(TabbedPanel):
 
     def set_device(self, device, tag, content):
         device[tag] = content
+
+    def open_fexpl(self):
+        subprocess.Popen(['xdg-open', "logs"])
 
 
 class AgusApp(App):
