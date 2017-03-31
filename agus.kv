@@ -1,0 +1,176 @@
+#:kivy 1.8.0
+#:import main main
+
+AgusRoot:
+
+<AgusRoot>:
+    setup_wid: setup_id
+    feed_wid: feed_id
+    plot_wid: plot_id
+
+    label_wid1: my_custom_label1
+    switch_wid1: my_custom_switch1
+    spin_wid1: my_custom_spin1
+
+    label_wid2: my_custom_label2
+    switch_wid2: my_custom_switch2
+    spin_wid2: my_custom_spin2
+
+    canvas.before:
+        Color:
+            rgb: .6, .6, .6
+        Rectangle:
+            size: self.size
+            source: 'data/background.png'
+
+    do_default_tab: False
+    tab_width: self.size[0] / len(self.tab_list)
+
+    TabbedPanelItem:
+        text: 'Setup'
+        id: setup_id
+
+        FloatLayout:
+            GridLayout:
+                cols: 3
+                row_force_default: True
+                row_default_height: 30
+                pos_hint: {'center_y': .1}
+                padding: 40
+                spacing: 10
+
+                Label:
+                    id: my_custom_label1
+                    text_size: self.width, None
+                    text: 'Licor 820'
+                Switch:
+                    id: my_custom_switch1
+                    active: False
+                    text: 'Licor 820'
+                Spinner:
+                    id: my_custom_spin1
+                    self: root.get_ports()
+
+                Label:
+                    id: my_custom_label2
+                    text_size: self.width, None
+                    text: 'Licor 6262'
+                Switch:
+                    id: my_custom_switch2
+                    active: False
+                    text: 'Licor 6262'
+                Spinner:
+                    id: my_custom_spin2
+                    self: root.get_ports()
+
+            Button:
+                size_hint: None, None
+                pos_hint: {'right' : 1, 'top' : 1}
+                size: '40dp', '40dp'
+                on_press: app.open_settings()
+                Image:
+                    source:'data/gear.png'
+                    size: self.parent.size
+                    y: self.parent.y
+                    x: self.parent.x
+                    allow_stretch: True
+                    keep_ratio: True
+
+            Button:
+                id: but_start
+                size_hint: None, None
+                pos_hint: {'right' : .8, 'bottom' : 1}
+                size: '150dp', '36dp'
+                text: 'Start' # root.info
+                on_press: root.get_probes()
+
+            Button:
+                id: but_stop
+                size_hint: None, None
+                pos_hint: {'right' : 1, 'bottom' : 1}
+                size: '150dp', '36dp'
+                text: 'Exit' # root.info
+                on_press: root.exit_app()
+
+
+    #########################
+    #         Todo          #
+    #########################
+    TabbedPanelItem:
+        text: 'Live Feed'
+        id: feed_id
+
+#        FloatLayout:
+        GridLayout:
+            cols: 2
+            pos_hint: {'center_y': 1}
+            row_force_default: True
+            row_default_height: 50
+            padding: 10
+            spacing: 10
+
+            Label:
+                text: 'Temperature (C°)'
+                text_size: self.width, None
+            Label:
+                text: '20.2457'
+
+            Label:
+                text: 'Pression (kPa)'
+                text_size: self.width, None
+            Label:
+                text: '10.154772e3'
+
+            Label:
+                text: 'CO2 (mm/m)'
+                text_size: self.width, None
+            Label:
+                text: '2.14577'
+
+            Label:
+                text: 'H2O (mm/m)'
+                text_size: self.width, None
+            Label:
+                text: '45.05455656e4'
+
+#            Button:
+#                size_hint: None, None
+#                pos_hint: {'right' : 1, 'top' : 1}
+#                size: '40dp', '40dp'
+#                on_press: app.open_settings()
+#                Image:
+#                    source:'data/gear.png'
+#                    size: self.parent.size
+#                    y: self.parent.y
+#                    x: self.parent.x
+#                    allow_stretch: True
+#                    keep_ratio: True
+
+    #########################
+    #         Todo          #
+    #########################
+    TabbedPanelItem:
+        text: 'Live Plot'
+        id: plot_id
+
+        FloatLayout:
+            BoxLayout:
+                padding: 10
+                spacing: 10
+                pos_hint: { 'center_x':.5, 'center_y':.5 }
+                Image:
+                    size: self.size
+                    source: 'data/graph.png'
+
+            Button:
+                size_hint: None, None
+                pos_hint: {'right' : 1, 'top' : 1}
+                size: '40dp', '40dp'
+                on_press: app.open_settings()
+                Image:
+                    source:'data/gear.png'
+                    size: self.parent.size
+                    y: self.parent.y
+                    x: self.parent.x
+                    allow_stretch: True
+                    keep_ratio: True

@@ -1,0 +1,3 @@
+title=a.gus
+author=Lowlow
+orientation=landscape

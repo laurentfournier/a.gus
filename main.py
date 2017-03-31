@@ -27,6 +27,12 @@ from kivy.factory           import Factory
 from kivy.properties        import (ListProperty, NumericProperty, ObjectProperty, OptionProperty, StringProperty)
 from kivy.storage.jsonstore import JsonStore
 
+from kivy.config import Config
+Config.set('graphics', 'width',        '800')
+Config.set('graphics', 'height',       '416')
+Config.set('graphics', 'multisamples', 0)
+Config.set('graphics', 'fullscreen',   'auto')
+
 from kivy.uix.accordion   import Accordion, AccordionItem
 from kivy.uix.boxlayout   import BoxLayout
 from kivy.uix.button      import Button
@@ -209,11 +215,11 @@ class AgusRoot(TabbedPanel):
 
     def set_probes(self):
         try:
-            logger = lm.logManager((q_data, q_header), devices, DEBUG)
-            logger.start()
+            self.logger = lm.logManager((q_data, q_header), devices, DEBUG)
+            self.logger.start()
 
-            t_logg = Process(target=logger.read)
-            t_logg.start()
+            self.t_logg = Process(target=logger.read)
+            self.t_logg.start()
 
         except:
             no_Device = True
@@ -222,9 +228,9 @@ class AgusRoot(TabbedPanel):
             pass
 
     def exit_app(self):
-        t_logg.terminate()
-        logger.stop()
-        os.system("sudo shutdown now -h")
+        #self.t_logg.terminate()
+        self.logger.stop()
+        sys.exit()
 
     def get_ports(self):
         # get active ports as text label:
